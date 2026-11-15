@@ -1341,14 +1341,14 @@
     </div>
   </div>
 
-  <!-- Interactive Web Checkout Demo Modal -->
+  <!-- Interactive Paystack Checkout Modal -->
   <div class="modal-backdrop" id="checkoutModal" onclick="if(event.target===this) closeCheckout()">
     <div class="modal">
       <button class="close-btn" onclick="closeCheckout()">✕</button>
-      <div class="mock-label" id="checkoutTag">WEB CHECKOUT DEMO (PAYSTACK / TRANSFER)</div>
+      <div class="mock-label" id="checkoutTag">INSTANT PAYSTACK CHECKOUT · CARD / TRANSFER / USSD</div>
       <h3 id="checkoutTitle" style="font-size:20px;margin-bottom:6px;">Buy Student Activation PIN</h3>
       <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Enter your email/WhatsApp and your app's Product
-        Key to receive your device-locked Activation PIN.</p>
+        Key to unlock your device-locked Activation PIN immediately after payment.</p>
       <label style="font-size:12px;color:var(--muted);">Student Email or WhatsApp Number</label>
       <input class="input" id="buyerInput" placeholder="e.g. student@gmail.com or 0803..." />
       <div id="singleStudentFields">
@@ -1368,12 +1368,30 @@
           style="display:none;font-size:11.5px;color:var(--emerald);margin-top:4px;font-weight:600;">✓ ₦500 referral
           discount applied (referrer earns ₦500)</div>
       </div>
-      <button class="btn-primary" style="width:100%;justify-content:center;" onclick="simulatePin()">Proceed to Paystack
-        Checkout</button>
-      <div class="pin-result" id="pinResult" style="display:none;">
-        <div style="font-size:11px;color:var(--emerald);font-weight:700;">DEMO PREVIEW · PAYSTACK WEBHOOK READY</div>
-        <div id="pinCode" style="font-family:var(--mono);font-size:18px;font-weight:700;margin-top:4px;"></div>
+      <button class="btn-primary" id="paystackCheckoutBtn" style="width:100%;justify-content:center;"
+        onclick="startPaystackCheckout()">Proceed to Paystack Checkout</button>
+      <div id="checkoutError"
+        style="display:none;margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35);color:#fcd34d;font-size:12.5px;line-height:1.45;">
       </div>
+      <div class="pin-result" id="pinResult" style="display:none;">
+        <div id="pinStatusLabel" style="font-size:11px;color:var(--emerald);font-weight:700;">PAYMENT VERIFIED ·
+          ACTIVATION PIN READY</div>
+        <div id="pinCode" style="font-family:var(--mono);font-size:18px;font-weight:700;margin-top:4px;"></div>
+        <div id="pinMeta" style="font-size:12px;color:var(--muted);margin-top:6px;"></div>
+        <button class="btn-secondary" id="copyPinBtn" type="button"
+          style="margin-top:10px;padding:8px 14px;font-size:12px;display:none;" onclick="copyVerifiedPin()">
+          Copy Activation PIN
+        </button>
+      </div>
+      <details style="margin-top:14px;font-size:12px;color:var(--muted);">
+        <summary style="cursor:pointer;">Already paid? Verify Paystack Reference</summary>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <input class="input" id="manualRefInput" placeholder="Paste Paystack reference"
+            style="margin:0;flex:1;font-family:var(--mono);" />
+          <button class="btn-secondary" type="button" style="padding:10px 14px;"
+            onclick="verifyPaystackReference(document.getElementById('manualRefInput').value)">Verify</button>
+        </div>
+      </details>
     </div>
   </div>
 
@@ -1387,7 +1405,8 @@
       <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
         Your direct APK download is starting now. When Chrome finishes:
         <br />1. Tap <strong>Open</strong> on the downloaded <code>PassForge-UTME-2027.apk</code> file.
-        <br />2. If prompted once, tap <strong>Settings → Allow from this source</strong>, then tap <strong>Install</strong>.
+        <br />2. If prompted once, tap <strong>Settings → Allow from this source</strong>, then tap
+        <strong>Install</strong>.
       </p>
       <div class="va-box" style="font-size:12px;">
         Package: PassForge UTME 2027 (v1.0.0 · 71.6 MB)<br />
@@ -1479,8 +1498,30 @@
       })
       .catch(() => { });
 
+    const VERCEL_CHECKOUT_URL = 'https://passforge-utme.vercel.app';
+    let lastVerifiedPin = '';
+
+    function getApiBaseUrl() {
+      const host = window.location.hostname || '';
+      if (host.endsWith('github.io')) return VERCEL_CHECKOUT_URL;
+      return '';
+    }
+
+    function showCheckoutError(msg) {
+      const box = document.getElementById('checkoutError');
+      if (!box) return;
+      if (!msg) {
+        box.style.display = 'none';
+        box.textContent = '';
+      } else {
+        box.style.display = 'block';
+        box.textContent = msg;
+      }
+    }
+
     function openCheckout(mode) {
       currentCheckoutMode = mode;
+      showCheckoutError('');
       document.getElementById('pinResult').style.display = 'none';
       const singleFields = document.getElementById('singleStudentFields');
       const discountBadge = document.getElementById('discountBadge');
@@ -1519,12 +1560,139 @@
       document.getElementById('checkoutModal').classList.remove('open');
     }
 
-    function simulatePin() {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      const seg = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-      document.getElementById('pinCode').textContent = `${seg()}-${seg()}-${seg()}`;
-      document.getElementById('pinResult').style.display = 'block';
+    async function startPaystackCheckout() {
+      showCheckoutError('');
+      document.getElementById('pinResult').style.display = 'none';
+
+      const buyerContact = (document.getElementById('buyerInput').value || '').trim();
+      const productKeyRaw = (document.getElementById('deviceKeyInput').value || '').trim().toUpperCase();
+      const referralCode = (document.getElementById('referralInput').value || '').trim().toUpperCase();
+
+      if (!buyerContact) {
+        return showCheckoutError('Please enter your email address or WhatsApp phone number.');
+      }
+      if (currentCheckoutMode === 'single') {
+        const cleanedKey = productKeyRaw.replace(/[^A-Z0-9]/g, '');
+        if (!/^[A-Z0-9]{9}$/.test(cleanedKey)) {
+          return showCheckoutError('Please enter the 9-character App Product Key from Activation Hub (e.g. K8M-4P2-9X7).');
+        }
+        if (referralCode && !/^JAMB-[A-Z0-9]{6}$/.test(referralCode)) {
+          return showCheckoutError('Referral code format should look like JAMB-8K4M2P (or leave blank).');
+        }
+      }
+
+      if (window.location.hostname.endsWith('github.io')) {
+        window.location.href = `${VERCEL_CHECKOUT_URL}/?open_checkout=${currentCheckoutMode}`;
+        return;
+      }
+
+      const btn = document.getElementById('paystackCheckoutBtn');
+      const prevText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Connecting to Paystack...';
+
+      try {
+        const resp = await fetch(`${getApiBaseUrl()}/api/paystack-init`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode: currentCheckoutMode,
+            buyerContact,
+            productKey: currentCheckoutMode === 'single' ? productKeyRaw : '',
+            referralCode: currentCheckoutMode === 'single' ? referralCode : ''
+          })
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.authorizationUrl) {
+          return showCheckoutError(data.message || 'Unable to start Paystack checkout right now.');
+        }
+        window.location.href = data.authorizationUrl;
+      } catch (_) {
+        showCheckoutError('Network error connecting to checkout server. Please check your internet and try again.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = prevText;
+      }
     }
+
+    async function verifyPaystackReference(rawRef) {
+      const ref = String(rawRef || '').trim();
+      if (!ref) {
+        return showCheckoutError('Enter a valid Paystack transaction reference.');
+      }
+      if (window.location.hostname.endsWith('github.io')) {
+        window.location.href = `${VERCEL_CHECKOUT_URL}/?reference=${encodeURIComponent(ref)}`;
+        return;
+      }
+
+      showCheckoutError('');
+      const resultBox = document.getElementById('pinResult');
+      const statusLabel = document.getElementById('pinStatusLabel');
+      const pinCodeEl = document.getElementById('pinCode');
+      const pinMetaEl = document.getElementById('pinMeta');
+      const copyBtn = document.getElementById('copyPinBtn');
+
+      resultBox.style.display = 'block';
+      statusLabel.textContent = 'VERIFYING PAYSTACK PAYMENT...';
+      pinCodeEl.textContent = 'Please wait...';
+      pinMetaEl.textContent = `Reference: ${ref}`;
+      copyBtn.style.display = 'none';
+      lastVerifiedPin = '';
+
+      try {
+        const resp = await fetch(`${getApiBaseUrl()}/api/paystack-verify?reference=${encodeURIComponent(ref)}`);
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.verified) {
+          resultBox.style.display = 'none';
+          return showCheckoutError(data.message || 'Payment verification failed or not completed yet.');
+        }
+
+        if (data.mode === 'reseller') {
+          statusLabel.textContent = 'RESELLER ORDER VERIFIED · 10-PIN PACK';
+          pinCodeEl.textContent = data.resellerOrderCode;
+          lastVerifiedPin = data.resellerOrderCode;
+          pinMetaEl.textContent = `Paid ${fmtNaira(data.amountNaira)} · Ref ${data.reference}. Send each student's App Product Key with this order code to generate all 10 device PINs.`;
+          copyBtn.textContent = 'Copy Order Code';
+          copyBtn.style.display = 'inline-flex';
+        } else {
+          statusLabel.textContent = `PAYMENT VERIFIED (${fmtNaira(data.amountNaira)}) · ACTIVATION PIN READY`;
+          pinCodeEl.textContent = data.formattedPin || data.activationPin;
+          lastVerifiedPin = data.activationPin;
+          pinMetaEl.textContent = `Locked to Product Key ${data.productKey} · Ref ${data.reference}. Paste inside App → Activation Hub.`;
+          copyBtn.textContent = 'Copy Activation PIN';
+          copyBtn.style.display = 'inline-flex';
+        }
+      } catch (_) {
+        resultBox.style.display = 'none';
+        showCheckoutError('Network error verifying Paystack reference. Retry in a moment.');
+      }
+    }
+
+    function copyVerifiedPin() {
+      if (!lastVerifiedPin) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(lastVerifiedPin);
+      }
+      const btn = document.getElementById('copyPinBtn');
+      if (btn) {
+        const old = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = old; }, 1600);
+      }
+    }
+
+    (function handlePaystackReturn() {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('reference') || params.get('trxref');
+      const openMode = params.get('open_checkout');
+      if (ref) {
+        openCheckout('single');
+        document.getElementById('manualRefInput').value = ref;
+        verifyPaystackReference(ref);
+      } else if (openMode === 'single' || openMode === 'reseller') {
+        openCheckout(openMode);
+      }
+    })();
 
     function showInstallHelper() {
       setTimeout(() => {
