@@ -1,0 +1,4 @@
+*.apk
+.vercel
+node_modules/
+

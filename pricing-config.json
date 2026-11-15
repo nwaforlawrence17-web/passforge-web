@@ -1,0 +1,9 @@
+{
+  "standardPrice": 2500,
+  "referredPrice": 2000,
+  "referralReward": 500,
+  "resellerPrice": 1500,
+  "minWithdrawalAmount": 500,
+  "websiteUrl": "https://jambcbt.vercel.app"
+}
+

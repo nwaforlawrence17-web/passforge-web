@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PassForge — Offline UTME &amp; CBT Prep + Hands-Free Jarvis AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #121214;
+      --surface: #1e1e22;
+      --surface-2: #26262c;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #a78bfa;
+      --accent-strong: #7c3aed;
+      --accent-glow: rgba(167, 139, 250, 0.22);
+      --emerald: #34d399;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(900px 500px at 85% -5%, rgba(124, 58, 237, 0.22), transparent 60%),
+        radial-gradient(700px 420px at 10% 15%, rgba(167, 139, 250, 0.1), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Nav */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(14px);
+      background: rgba(18, 18, 20, 0.85);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .brand-orb {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: radial-gradient(circle at 35% 30%, #e9d5ff, #7c3aed 65%, #3b0764);
+      box-shadow: 0 0 18px var(--accent-glow);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color .2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #121214;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 48px 0 40px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 44px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(167, 139, 250, 0.12);
+      border: 1px solid rgba(167, 139, 250, 0.3);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .pill.emerald {
+      background: rgba(52, 211, 153, 0.12);
+      border-color: rgba(52, 211, 153, 0.35);
+      color: var(--emerald);
+    }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      line-height: 1.08;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: 18px;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      color: #d1d5db;
+      font-size: 16px;
+      max-width: 560px;
+      margin-bottom: 24px;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      text-align: center;
+      gap: 6px 10px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: #121214;
+      font-weight: 800;
+      font-size: 15px;
+      padding: 15px 24px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.35);
+      transition: transform .15s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 15px;
+      padding: 15px 22px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(167, 139, 250, 0.45);
+    }
+
+    .trust-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .trust-meta strong {
+      color: var(--emerald);
+    }
+
+    /* Proof Stats Ribbon */
+    .stats-ribbon {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .stat-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 16px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: var(--mono);
+      font-size: clamp(22px, 3vw, 28px);
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1.15;
+    }
+
+    .stat-box.green .stat-num {
+      color: var(--emerald);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Interactive Phone Mockup */
+    .phone-wrap {
+      display: flex;
+      justify-content: center;
+    }
+
+    .phone {
+      width: 100%;
+      max-width: 325px;
+      background: #0d0d10;
+      border-radius: 36px;
+      padding: 14px;
+      border: 2px solid rgba(167, 139, 250, 0.35);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.65), 0 0 40px rgba(124, 58, 237, 0.22);
+    }
+
+    .phone-screen {
+      background: var(--bg);
+      border-radius: 24px;
+      padding: 16px;
+      min-height: 490px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .phone-screen-img {
+      padding: 0;
+      min-height: 0;
+      overflow: hidden;
+      background: #121212;
+    }
+
+    .phone-screen-img img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .phone-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: var(--surface);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+
+    .phone-tab {
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      padding: 7px 6px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .phone-tab.active {
+      background: var(--accent);
+      color: #121214;
+    }
+
+    .mock-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .mock-label {
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      margin-bottom: 6px;
+    }
+
+    .mock-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .mock-option.selected {
+      border-color: var(--accent);
+      background: rgba(167, 139, 250, 0.12);
+    }
+
+    .badge-letter {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.05;
+      font-size: 13px;
+    }
+
+    .frac span:first-child {
+      border-bottom: 1.5px solid var(--text);
+      padding: 0 3px 1px;
+    }
+
+    .jarvis-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .orb-mini {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #f3e8ff, #8b5cf6 65%, #3b0764);
+      box-shadow: 0 0 18px rgba(167, 139, 250, 0.7);
+    }
+
+    /* Sections */
+    section {
+      padding: 46px 0;
+    }
+
+    .section-head {
+      max-width: 720px;
+      margin-bottom: 26px;
+    }
+
+    .section-head h2 {
+      font-size: clamp(24px, 3.4vw, 34px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.18;
+      margin-bottom: 8px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+    }
+
+    .card-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(167, 139, 250, 0.14);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    .card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Real Screenshots Carousel */
+    .gallery-scroll {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(220px, 1fr));
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .shot-card {
+      scroll-snap-align: start;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 12px;
+      cursor: pointer;
+      transition: border-color .2s, transform .2s;
+    }
+
+    .shot-card:hover {
+      border-color: rgba(167, 139, 250, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .shot-img-wrap {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #0b0b0d;
+      aspect-ratio: 9 / 19.5;
+    }
+
+    .shot-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .shot-meta {
+      padding: 12px 4px 4px;
+    }
+
+    .shot-meta strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+
+    .shot-meta span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* Jarvis Hands-Free Spotlight */
+    .spotlight {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.16), rgba(30, 30, 34, 0.96) 55%);
+      border: 1px solid rgba(167, 139, 250, 0.32);
+      border-radius: 26px;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .cmd-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .cmd-chip {
+      background: #121214;
+      border: 1px solid rgba(167, 139, 250, 0.25);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .cmd-chip code {
+      font-family: var(--mono);
+      color: var(--accent);
+      font-size: 12px;
+    }
+
+    .cmd-chip span {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    /* Comparison Table */
+    .compare-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 540px;
+    }
+
+    th,
+    td {
+      padding: 15px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.02);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    th.ours {
+      color: var(--accent);
+      background: rgba(167, 139, 250, 0.08);
+    }
+
+    td.ours {
+      background: rgba(167, 139, 250, 0.04);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .yes {
+      color: var(--emerald);
+      font-weight: 700;
+    }
+
+    .no {
+      color: var(--rose);
+      font-weight: 600;
+    }
+
+    /* Subject Explorer */
+    .subject-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .sub-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: #d1d5db;
+      padding: 8px 13px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .sub-pill.active,
+    .sub-pill:hover {
+      background: rgba(167, 139, 250, 0.16);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .subject-detail-box {
+      background: var(--surface);
+      border: 1px solid rgba(167, 139, 250, 0.28);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Install Guide */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .price-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .price-card.featured {
+      border-color: rgba(167, 139, 250, 0.5);
+      background: linear-gradient(180deg, rgba(124, 58, 237, 0.14), var(--surface) 55%);
+    }
+
+    .price {
+      font-size: 38px;
+      font-weight: 900;
+      margin: 10px 0 4px;
+    }
+
+    .price span {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .list {
+      list-style: none;
+      margin: 18px 0 24px;
+      display: grid;
+      gap: 10px;
+      font-size: 14px;
+      color: #d1d5db;
+    }
+
+    .list li::before {
+      content: "✓ ";
+      color: var(--emerald);
+      font-weight: 800;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(6px);
+      display: none;
+      place-items: center;
+      z-index: 60;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: grid;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 440px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      position: relative;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: var(--surface-2);
+      color: var(--text);
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: 700;
+      z-index: 2;
+    }
+
+    .input {
+      width: 100%;
+      background: #121214;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin: 8px 0 14px;
+    }
+
+    .va-box {
+      background: #121214;
+      border: 1px dashed rgba(167, 139, 250, 0.5);
+      border-radius: 16px;
+      padding: 16px;
+      margin: 14px 0;
+      font-family: var(--mono);
+    }
+
+    .pin-result {
+      background: rgba(52, 211, 153, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      padding: 14px;
+      border-radius: 14px;
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    /* Sticky Mobile Download Bar */
+    .mobile-sticky-bar {
+      display: none;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 34px 0 88px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-flex {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    @media (max-width: 900px) {
+
+      .hero-grid,
+      .bento,
+      .steps,
+      .pricing-grid,
+      .spotlight {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-ribbon {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .brand {
+        font-size: 15px;
+        gap: 8px;
+      }
+
+      .brand-orb {
+        width: 24px;
+        height: 24px;
+      }
+
+      .nav-cta {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+
+      .gallery-scroll {
+        display: flex;
+      }
+
+      .shot-card {
+        flex: 0 0 72%;
+        max-width: 270px;
+      }
+
+      .spotlight {
+        padding: 20px;
+      }
+
+      .cta-row a,
+      .cta-row button {
+        width: 100%;
+      }
+
+      .mobile-sticky-bar {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 45;
+        background: rgba(18, 18, 20, 0.94);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid var(--border);
+        padding: 10px 14px;
+        gap: 10px;
+      }
+
+      .mobile-sticky-bar a,
+      .mobile-sticky-bar button {
+        flex: 1;
+        padding: 12px 10px;
+        font-size: 13px;
+        border-radius: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#">
+        <div class="brand-orb"></div>
+        <span>PassForge <span style="color:var(--accent)">UTME</span></span>
+      </a>
+      <nav class="nav-links">
+        <a href="#screenshots">App Preview</a>
+        <a href="#jarvis">Jarvis AI</a>
+        <a href="#compare">Compare</a>
+        <a href="#subjects">18 Subjects</a>
+        <a href="#pricing">Activation PIN</a>
+      </nav>
+      <button class="nav-cta" onclick="openCheckout('single')">Get Activation PIN</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="pill emerald">FREE 72-HOUR FULL TRIAL · NO ADS · ₦2,500 ONE-TIME (₦2,000 WITH CODE)</div>
+          <h1>Score <span>300+</span> in JAMB 2027 — Offline CBT + Hands-Free AI Tutor.</h1>
+          <p class="hero-sub">
+            Practice <strong>28,333 verified JAMB past &amp; model questions</strong> (1992–2025) across all 18
+            subjects offline, track your live score out of <strong>400</strong>, and talk directly to <strong>Jarvis
+              AI</strong> to explain calculations or navigate the app hands-free.
+          </p>
+          <div class="cta-row">
+            <a class="btn-primary"
+              href="https://github.com/nwaforlawrence17-web/passforge-web/releases/download/v1.0.0/PassForge-UTME-2027.apk"
+              onclick="showInstallHelper()">
+              <span>⬇ Download Free Android APK</span>
+              <span style="font-size:12px;opacity:.8;font-weight:700;">v1.0 · 71.6 MB · 72h Trial</span>
+            </a>
+            <button class="btn-secondary" id="heroBuyBtn" onclick="openCheckout('single')">
+              🔑 Buy Activation PIN (₦2,500)
+            </button>
+          </div>
+          <div class="trust-meta">
+            <span><strong>✓</strong> 72-Hr Free Full Test Before Paying</span>
+            <span><strong>✓</strong> Pay on Website (OPay / PalmPay / Bank Transfer) → Instant PIN</span>
+            <span><strong>✓</strong> 100% Offline After Activation</span>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="phone-screen phone-screen-img">
+              <img src="screenshots/hero_exam.png"
+                alt="JAMB CBT Prep exam screen showing a Physics question with options A to D, Prev/Next buttons and the Jarvis orb"
+                onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROOF STATS RIBBON -->
+      <div class="stats-ribbon">
+        <div class="stat-box">
+          <div class="stat-num">28,333</div>
+          <div class="stat-label">Verified Past &amp; Model Qs</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">18</div>
+          <div class="stat-label">Subjects + Dictionaries</div>
+        </div>
+        <div class="stat-box green">
+          <div class="stat-num">72 hrs</div>
+          <div class="stat-label">Full Free Trial First</div>
+        </div>
+        <div class="stat-box green">
+          <div class="stat-num" id="ribbonPrice">₦2,500</div>
+          <div class="stat-label">One-Time (₦2k w/ Code)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REAL PHONE SCREENSHOTS GALLERY -->
+    <section id="screenshots">
+      <div class="section-head">
+        <div class="pill">REAL ANDROID SCREENSHOTS</div>
+        <h2>See the actual app running on Android</h2>
+        <p>Swipe through real screenshots from our app — clean typography, OLED dark exam screen, Jarvis Voice orb, and
+          /400 score diagnostics. Tap any screen to zoom.</p>
+      </div>
+
+      <div class="gallery-scroll">
+        <div class="shot-card" onclick="openLightboxCard(this, 'Smart Study Dashboard &amp; 18 Subject Dictionaries')">
+          <div class="shot-img-wrap">
+            <img src="screenshots/screen_1_home.png"
+              onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
+              alt="Home Dashboard Screenshot" />
+          </div>
+          <div class="shot-meta">
+            <strong>1. Smart Study Home</strong>
+            <span>Streak tracker, accuracy badge, 1-tap Continue Practice &amp; 18 Subject Dictionaries.</span>
+          </div>
+        </div>
+
+        <div class="shot-card"
+          onclick="openLightboxCard(this, 'OLED Dark CBT Exam with Built-in Calculator &amp; Formula Sheet')">
+          <div class="shot-img-wrap">
+            <img src="screenshots/screen_2_exam.png"
+              onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
+              alt="CBT Exam Screen Screenshot" />
+          </div>
+          <div class="shot-meta">
+            <strong>2. Real CBT Exam UI</strong>
+            <span>Built-in Calculator, Formula Sheet (Σ), countdown timer, &amp; Jarvis orb right on screen.</span>
+          </div>
+        </div>
+
+        <div class="shot-card"
+          onclick="openLightboxCard(this, 'Jarvis AI Tutor — Voice Input &amp; Hands-Free App Navigation')">
+          <div class="shot-img-wrap">
+            <img src="screenshots/screen_3_jarvis.png"
+              onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
+              alt="Jarvis AI Overlay Screenshot" />
+          </div>
+          <div class="shot-meta">
+            <strong>3. Jarvis Voice &amp; AI</strong>
+            <span>Ask by voice or text while studying. Reads solutions aloud &amp; opens screens hands-free.</span>
+          </div>
+        </div>
+
+        <div class="shot-card" onclick="openLightboxCard(this, 'Global /400 JAMB Analytics &amp; Exam Countdown')">
+          <div class="shot-img-wrap">
+            <img src="screenshots/screen_4_analytics.png"
+              onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
+              alt="0 to 400 Analytics Screenshot" />
+          </div>
+          <div class="shot-meta">
+            <strong>4. /400 Score Projection</strong>
+            <span>Tracks your JAMB countdown, projected UTME score out of 400, accuracy &amp; speed/question.</span>
+          </div>
+        </div>
+
+        <div class="shot-card" onclick="openLightboxCard(this, 'Custom 4-Subject UTME Mock, Topic &amp; Year Drill')">
+          <div class="shot-img-wrap">
+            <img src="screenshots/screen_5_practice.png"
+              onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
+              alt="Practice Setup Screenshot" />
+          </div>
+          <div class="shot-meta">
+            <strong>5. Custom Study Setup</strong>
+            <span>Pick up to 4 subjects, 1992–2025 years, specific syllabus topics, question count &amp; timer.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HANDS-FREE JARVIS SPOTLIGHT -->
+    <section id="jarvis">
+      <div class="spotlight">
+        <div>
+          <div class="pill">WHAT OTHER JAMB APPS DON'T HAVE</div>
+          <h2 style="font-size: clamp(24px, 3vw, 32px); font-weight: 800; line-height: 1.15; margin-bottom: 12px;">
+            Jarvis literally navigates the app <span style="color:var(--accent)">hands-free</span> when you're on data.
+          </h2>
+          <p style="color:#d1d5db;font-size:15px;margin-bottom:16px;">
+            Older CBT apps force you to read static textbook answers on your own. With <strong>Jarvis AI</strong> on
+            mobile data, tap the mic and talk to your tutor like a real person — Jarvis automatically sees the exact
+            question on your screen, talks you through the working, and can even jump around the app for you without
+            tapping menus.
+          </p>
+          <div class="trust-meta">
+            <span><strong>✓</strong> Knows your active question automatically</span>
+            <span><strong>✓</strong> Speaks answers via Kokoro or Android voice</span>
+            <span><strong>✓</strong> Past questions &amp; dictionaries stay 100% offline</span>
+          </div>
+        </div>
+
+        <div class="cmd-list">
+          <div class="cmd-chip">
+            <code>"Open the calculator"</code>
+            <span>Launches CBT Calc inside exam</span>
+          </div>
+          <div class="cmd-chip">
+            <code>"Open Physics formulas"</code>
+            <span>Opens Formula Vault / Dictionary</span>
+          </div>
+          <div class="cmd-chip">
+            <code>"Go to question 12"</code>
+            <span>Jumps straight to Q12 hands-free</span>
+          </div>
+          <div class="cmd-chip">
+            <code>"Show my analytics"</code>
+            <span>Switches to /400 Score Stats</span>
+          </div>
+          <div class="cmd-chip">
+            <code>"Open To Kill a Mockingbird"</code>
+            <span>Opens 2027 Literature text guide</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY STUDENTS SWITCH (COMPARISON TABLE) -->
+    <section id="compare">
+      <div class="section-head">
+        <h2>Why students leave expensive CBT apps for this</h2>
+        <p>Built cleanly for fast studying on any Nigerian Android phone — zero bloat, better math rendering, and fair
+          student pricing.</p>
+      </div>
+      <div class="compare-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th class="ours">PassForge UTME 2027</th>
+              <th>Typical Paid CBT Apps</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>One-Time Student Price</td>
+              <td class="ours"><span class="yes" id="comparePrice">₦2,500</span> (₦2,000 with Referral Code)</td>
+              <td>₦4,000 – ₦5,900 (Myschool / TestDriller)</td>
+            </tr>
+            <tr>
+              <td>Try Everything First</td>
+              <td class="ours"><span class="yes">72-Hour Full Access Free Trial</span></td>
+              <td><span class="no">2–5 questions locked demo</span></td>
+            </tr>
+            <tr>
+              <td>Hands-Free AI Voice Tutor &amp; App Navigation</td>
+              <td class="ours"><span class="yes">Included (Jarvis Voice AI)</span></td>
+              <td><span class="no">Static text explanations only</span></td>
+            </tr>
+            <tr>
+              <td>Math, Physics &amp; Chemistry Equations</td>
+              <td class="ours"><span class="yes">Clean LaTeX &amp; Stacked Fractions</span></td>
+              <td><span class="no">Broken symbols / raw HTML</span></td>
+            </tr>
+            <tr>
+              <td>Offline Subject Dictionaries &amp; Formula Vault</td>
+              <td class="ours"><span class="yes">All 18 Subjects + Sci Formulas</span></td>
+              <td><span class="no">Basic dictionary or none</span></td>
+            </tr>
+            <tr>
+              <td>2027 JAMB Prescribed Literature Texts</td>
+              <td class="ours"><span class="yes">Prose, Drama &amp; 11 Poems Offline</span></td>
+              <td>Often sold in a separate app</td>
+            </tr>
+            <tr>
+              <td>Ads &amp; Popups While Timed</td>
+              <td class="ours"><span class="yes">Zero Ads</span></td>
+              <td><span class="no">Banner / Interstitial Ads</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CORE FEATURES BENTO -->
+    <section id="features">
+      <div class="section-head">
+        <h2>Everything packed inside one lightweight APK</h2>
+        <p>Every study tool you need from day one of revision until the morning of your UTME exam.</p>
+      </div>
+      <div class="bento">
+        <div class="card">
+          <div class="card-icon">Σ</div>
+          <h3>Built-in Calculator &amp; Formula Vault</h3>
+          <p>Tap the calculator or Σ formula sheet right inside any exam session for instant Physics, Chemistry, and
+            Maths formulas without leaving the question.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📖</div>
+          <h3>18 Offline Subject Dictionaries</h3>
+          <p>Instant offline terminology and definitions across all 18 JAMB subjects — look up hard concepts even in
+            Airplane Mode.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📚</div>
+          <h3>Complete 2027 Literature Hub</h3>
+          <p>Includes <em>So the Path Does Not Die</em>, <em>Redemption Road</em>, <em>Path of Lucas</em>, <em>To Kill a
+              Mockingbird</em>, <em>Antony and Cleopatra</em>, <em>An Inspector Calls</em>, <em>The Marriage of
+              Anansewa</em>, <em>Once Upon an Elephant</em> &amp; 11 JAMB poems.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE 18 SUBJECTS EXPLORER -->
+    <section id="subjects">
+      <div class="section-head">
+        <h2>All 18 UTME Subjects Included (1992–2025)</h2>
+        <p>Tap any subject below to check verified past questions included offline — practice by random mix, specific
+          year, or single syllabus topic.</p>
+      </div>
+      <div class="subject-pills" id="subjectPills"></div>
+      <div class="subject-detail-box" id="subjectDetail">
+        <div>
+          <div class="mock-label" id="subTag">VERIFIED QUESTION BANK</div>
+          <h3 id="subName" style="font-size:20px;margin-bottom:4px;">Use of English</h3>
+          <p id="subDesc" style="font-size:14px;color:var(--muted);">3,240 verified questions across 38 papers
+            (1992–2025 Model II) + offline English glossary.</p>
+        </div>
+        <a class="btn-primary"
+          href="https://github.com/nwaforlawrence17-web/passforge-web/releases/download/v1.0.0/PassForge-UTME-2027.apk"
+          onclick="showInstallHelper()">⬇ Practice Free for 72 Hrs</a>
+      </div>
+    </section>
+
+    <!-- INSTALL STEPS -->
+    <section id="install">
+      <div class="section-head">
+        <h2>Start practicing in 45 seconds</h2>
+        <p>No Play Store card stress. Install straight from Chrome, test the full app free for 72 hours, then activate
+          anytime with a website PIN.</p>
+      </div>
+      <div class="steps">
+        <div class="card">
+          <div class="step-num">STEP 01</div>
+          <h3>Download &amp; Install APK</h3>
+          <p>Tap <strong>Download Free Android APK</strong>. When Chrome asks once, tap <strong>Settings → Allow from
+              this source</strong> and install.</p>
+        </div>
+        <div class="card">
+          <div class="step-num">STEP 02</div>
+          <h3>Test Everything Free (72 Hrs)</h3>
+          <p>Try all 18 subjects, Literature texts, /400 score analytics, and Jarvis hands-free voice control free for 3
+            full days.</p>
+        </div>
+        <div class="card">
+          <div class="step-num">STEP 03</div>
+          <h3>Unlock Forever via PIN</h3>
+          <p>Pay ₦2,500 (or ₦2,000 with a friend's referral code) via OPay, PalmPay, or Bank Transfer right here on this
+            website, get your instant Activation PIN,
+            and unlock offline forever.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing">
+      <div class="section-head">
+        <h2>Simple one-time activation — no subscriptions</h2>
+        <p>Pay once for the entire 2027 JAMB season. Or partner as a CBT café / tutorial center reseller.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card featured">
+          <div>
+            <div class="pill" style="margin-bottom:8px;">MOST POPULAR · STUDENTS</div>
+            <h3>Single Student License</h3>
+            <div class="price" id="singleCardPrice">₦2,500 <span>one-time (₦2,000 with referral code)</span></div>
+            <ul class="list">
+              <li>All 28,333 questions across 18 JAMB subjects</li>
+              <li>Full UTME 4-subject mock + topic &amp; year filters</li>
+              <li>2027 Literature texts, 18 glossaries &amp; /400 analytics</li>
+              <li id="singleCardReferralBullet">Have a friend's code? Pay <strong>₦2,000 (save ₦500)</strong> &amp; they
+                earn <strong>₦500 cash</strong></li>
+            </ul>
+          </div>
+          <button class="btn-primary" style="justify-content:center;" onclick="openCheckout('single')">Buy Single
+            Activation PIN</button>
+        </div>
+
+        <div class="price-card">
+          <div>
+            <div class="pill" style="margin-bottom:8px;">CAFÉS &amp; LESSON CENTERS</div>
+            <h3>Reseller Bulk Pack (10+ PINs)</h3>
+            <div class="price" id="resellerCardPrice">₦1,500 <span>/ PIN (keep ₦1,000/sale)</span></div>
+            <ul class="list">
+              <li>Buy 10, 25, or 50 activation PINs at ₦1,500 each</li>
+              <li>Sell to students at ₦2,500 &amp; keep <strong>₦1,000 profit per PIN</strong></li>
+              <li>Each PIN locks cleanly to 1 student Android device</li>
+              <li>Delivered instantly after transfer confirmation</li>
+            </ul>
+          </div>
+          <button class="btn-secondary" style="justify-content:center;" onclick="openCheckout('reseller')">Order Bulk
+            Reseller PINs</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="section-head">
+        <h2>Quick Answers</h2>
+      </div>
+      <div class="bento">
+        <div class="card">
+          <h3>Do I need internet after activating?</h3>
+          <p>No. All 28,333 questions, solutions, 18 dictionaries, formula sheets, Literature books, and /400 analytics
+            work 100% offline. Only Jarvis AI voice/chat uses light mobile data.</p>
+        </div>
+        <div class="card">
+          <h3>Can I pay with OPay, PalmPay, or Kuda?</h3>
+          <p>Yes! Buy your Activation PIN right here on our website using any Nigerian bank app (OPay, PalmPay,
+            Moniepoint, Kuda, GTBank, UBA) or debit card, then paste the PIN inside the app.</p>
+        </div>
+        <div class="card">
+          <h3>Why start with a 72-hour free trial?</h3>
+          <p>So you can verify the speed, question accuracy, math rendering, and Jarvis voice tutor yourself before
+            spending a kobo.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-flex">
+      <div>© 2026–2027 PassForge · Offline CBT Suite (UTME · WAEC/NECO · JUPEB · IJMB · BECE · ICAN · Bar)</div>
+      <div class="footer-links">
+        <a href="#faq">Support &amp; WhatsApp</a>
+        <a href="#pricing">Reseller Terms</a>
+        <a href="#install">Install Guide</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Sticky Mobile Action Bar -->
+  <div class="mobile-sticky-bar">
+    <a class="btn-primary"
+      href="https://github.com/nwaforlawrence17-web/passforge-web/releases/download/v1.0.0/PassForge-UTME-2027.apk"
+      onclick="showInstallHelper()">⬇ Free APK (72h Trial)</a>
+    <button class="btn-secondary" id="stickyBuyBtn" onclick="openCheckout('single')">🔑 Buy PIN (₦2.5k)</button>
+  </div>
+
+  <!-- Screenshot Lightbox Modal -->
+  <div class="modal-backdrop" id="lightboxModal" onclick="if(event.target===this) closeLightbox()">
+    <div class="modal" style="max-width:390px;padding:16px;text-align:center;">
+      <button class="close-btn" onclick="closeLightbox()">✕</button>
+      <img id="lightboxImg" src="" alt="App Screenshot" style="width:100%;border-radius:16px;margin-bottom:10px;" />
+      <div id="lightboxCaption" style="font-size:13px;color:#d1d5db;font-weight:600;"></div>
+    </div>
+  </div>
+
+  <!-- Interactive Web Checkout Demo Modal -->
+  <div class="modal-backdrop" id="checkoutModal" onclick="if(event.target===this) closeCheckout()">
+    <div class="modal">
+      <button class="close-btn" onclick="closeCheckout()">✕</button>
+      <div class="mock-label" id="checkoutTag">WEB CHECKOUT DEMO (PAYSTACK / TRANSFER)</div>
+      <h3 id="checkoutTitle" style="font-size:20px;margin-bottom:6px;">Buy Student Activation PIN</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Enter your email/WhatsApp and your app's Product
+        Key to receive your device-locked Activation PIN.</p>
+      <label style="font-size:12px;color:var(--muted);">Student Email or WhatsApp Number</label>
+      <input class="input" id="buyerInput" placeholder="e.g. student@gmail.com or 0803..." />
+      <div id="singleStudentFields">
+        <label style="font-size:12px;color:var(--muted);">App Product Key (from Activation Hub in App)</label>
+        <input class="input" id="deviceKeyInput" placeholder="e.g. K8M-4P2-9X7"
+          style="text-transform:uppercase;font-family:var(--mono);" />
+        <label style="font-size:12px;color:var(--muted);" id="referralLabel">Referral Code (Optional — saves
+          ₦500)</label>
+        <input class="input" id="referralInput" placeholder="e.g. JAMB-8K4M2P (pay ₦2,000 instead of ₦2,500)"
+          style="text-transform:uppercase;font-family:var(--mono);" oninput="updateReferralDiscount()" />
+      </div>
+      <div class="va-box">
+        <div style="font-size:11px;color:var(--muted);">PAYSTACK CHECKOUT SUMMARY</div>
+        <div style="font-size:13px;margin-top:6px;">Amount to Pay: <strong id="modalAmount"
+            style="color:var(--accent);font-size:16px;">₦2,500</strong></div>
+        <div id="discountBadge"
+          style="display:none;font-size:11.5px;color:var(--emerald);margin-top:4px;font-weight:600;">✓ ₦500 referral
+          discount applied (referrer earns ₦500)</div>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center;" onclick="simulatePin()">Proceed to Paystack
+        Checkout</button>
+      <div class="pin-result" id="pinResult" style="display:none;">
+        <div style="font-size:11px;color:var(--emerald);font-weight:700;">DEMO PREVIEW · PAYSTACK WEBHOOK READY</div>
+        <div id="pinCode" style="font-family:var(--mono);font-size:18px;font-weight:700;margin-top:4px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APK Download / Install Helper Modal -->
+  <div class="modal-backdrop" id="downloadModal"
+    onclick="if(event.target===this) document.getElementById('downloadModal').classList.remove('open')">
+    <div class="modal">
+      <button class="close-btn" onclick="document.getElementById('downloadModal').classList.remove('open')">✕</button>
+      <div class="mock-label">DOWNLOAD STARTED · PASSFORGE UTME 2027 (71.6 MB)</div>
+      <h3 style="font-size:20px;margin-bottom:8px;">Installing PassForge APK on Android</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
+        Your direct APK download is starting now. When Chrome finishes:
+        <br />1. Tap <strong>Open</strong> on the downloaded <code>PassForge-UTME-2027.apk</code> file.
+        <br />2. If prompted once, tap <strong>Settings → Allow from this source</strong>, then tap <strong>Install</strong>.
+      </p>
+      <div class="va-box" style="font-size:12px;">
+        Package: PassForge UTME 2027 (v1.0.0 · 71.6 MB)<br />
+        Includes: 28,333 Qs · 18 Subjects · 72h Full Free Trial
+      </div>
+      <a class="btn-primary" style="width:100%;justify-content:center;"
+        href="https://github.com/nwaforlawrence17-web/passforge-web/releases/download/v1.0.0/PassForge-UTME-2027.apk">
+        ⬇ Click Here if Download Didn't Start
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const subjectsData = [
+      { name: 'English', qs: '3,240 questions', papers: '38 papers (1992–2025 Model II)', extra: 'Includes offline English Subject Dictionary & Comprehension drills' },
+      { name: 'Physics', qs: '2,463 questions', papers: '54 papers', extra: 'Includes Physics Formula Vault, clean LaTeX equations & Calculator' },
+      { name: 'Chemistry', qs: '2,280 questions', papers: '51 papers', extra: 'Includes Chemistry Formula Vault, balanced equations & Glossary' },
+      { name: 'Biology', qs: '2,200 questions', papers: '49 papers', extra: 'Includes offline Biology Subject Dictionary & Topic Drills' },
+      { name: 'Mathematics', qs: '2,177 questions', papers: '48 papers', extra: 'Stacked fractions, Maths Formula Vault & built-in CBT Calculator' },
+      { name: 'Economics', qs: '2,068 questions', papers: '45 papers', extra: 'Includes offline Economics Dictionary & calculation walkthroughs' },
+      { name: 'CRK', qs: '2,032 questions', papers: '44 papers', extra: 'Topic-by-topic scripture themes + offline CRK glossary' },
+      { name: 'Government', qs: '1,960 questions', papers: '43 papers', extra: 'Constitutional history, past years & offline glossary' },
+      { name: 'Commerce', qs: '1,820 questions', papers: '40 papers', extra: 'Business concepts, calculations & Commerce Subject Dictionary' },
+      { name: 'Geography', qs: '1,700 questions', papers: '37 papers', extra: 'Physical & human geography + offline Geography terms' },
+      { name: 'Literature', qs: '1,410 questions', papers: '31 papers', extra: 'Plus ALL 2027 JAMB Prose, Drama & 11 Poems offline!' },
+      { name: 'IRK', qs: '1,260 questions', papers: '29 papers', extra: 'Complete offline IRK past questions & term glossary' },
+      { name: 'Yoruba', qs: '779 questions', papers: '18 papers', extra: 'Authentic past questions + offline Yoruba Subject Dictionary' },
+      { name: 'History', qs: '768 questions', papers: '18 papers', extra: 'Nigerian & African history drills + offline History terms' },
+      { name: 'French', qs: '579 questions', papers: '14 papers', extra: 'Grammar, comprehension & offline French Subject Dictionary' },
+      { name: 'Hausa', qs: '579 questions', papers: '14 papers', extra: 'Language, literature & offline Hausa term dictionary' },
+      { name: 'Igbo', qs: '578 questions', papers: '14 papers', extra: 'Grammar, culture & offline Igbo Subject Dictionary' },
+      { name: 'Computer Studies', qs: '440 questions', papers: '11 papers', extra: 'Logic gates, networking & offline Computer Dictionary' }
+    ];
+
+    const pillsContainer = document.getElementById('subjectPills');
+    subjectsData.forEach((s, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'sub-pill' + (idx === 0 ? ' active' : '');
+      btn.textContent = s.name;
+      btn.onclick = () => {
+        document.querySelectorAll('.sub-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('subName').textContent = s.name;
+        document.getElementById('subDesc').textContent = `${s.qs} across ${s.papers}. ${s.extra}.`;
+      };
+      pillsContainer.appendChild(btn);
+    });
+    document.getElementById('subDesc').textContent = `${subjectsData[0].qs} across ${subjectsData[0].papers}. ${subjectsData[0].extra}.`;
+
+    function openLightboxCard(card, caption) {
+      const img = card.querySelector('img');
+      document.getElementById('lightboxImg').src = img ? (img.currentSrc || img.src) : '';
+      document.getElementById('lightboxCaption').textContent = caption;
+      document.getElementById('lightboxModal').classList.add('open');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightboxModal').classList.remove('open');
+    }
+
+    let currentCheckoutMode = 'single';
+    let livePricing = {
+      standardPrice: 2500,
+      referredPrice: 2000,
+      referralReward: 500,
+      resellerPrice: 1500
+    };
+
+    function fmtNaira(n) {
+      return '₦' + Number(n).toLocaleString('en-NG');
+    }
+
+    fetch('pricing-config.json')
+      .then(r => r.ok ? r.json() : null)
+      .then(cfg => {
+        if (!cfg || !cfg.standardPrice) return;
+        livePricing = Object.assign(livePricing, cfg);
+        const discount = livePricing.standardPrice - livePricing.referredPrice;
+        const heroBuy = document.getElementById('heroBuyBtn');
+        if (heroBuy) heroBuy.textContent = `🔑 Buy Activation PIN (${fmtNaira(livePricing.standardPrice)})`;
+        const ribbonPrice = document.getElementById('ribbonPrice');
+        if (ribbonPrice) ribbonPrice.textContent = fmtNaira(livePricing.standardPrice);
+        const comparePrice = document.getElementById('comparePrice');
+        if (comparePrice) comparePrice.textContent = fmtNaira(livePricing.standardPrice);
+        const singleCardPrice = document.getElementById('singleCardPrice');
+        if (singleCardPrice) singleCardPrice.innerHTML = `${fmtNaira(livePricing.standardPrice)} <span>one-time (${fmtNaira(livePricing.referredPrice)} with referral code)</span>`;
+        const refBullet = document.getElementById('singleCardReferralBullet');
+        if (refBullet) refBullet.innerHTML = `Have a friend's code? Pay <strong>${fmtNaira(livePricing.referredPrice)} (save ${fmtNaira(discount)})</strong> &amp; they earn <strong>${fmtNaira(livePricing.referralReward)} cash</strong>`;
+      })
+      .catch(() => { });
+
+    function openCheckout(mode) {
+      currentCheckoutMode = mode;
+      document.getElementById('pinResult').style.display = 'none';
+      const singleFields = document.getElementById('singleStudentFields');
+      const discountBadge = document.getElementById('discountBadge');
+      if (mode === 'reseller') {
+        document.getElementById('checkoutTitle').textContent = 'Order 10 Reseller Bulk PINs';
+        document.getElementById('modalAmount').textContent = `${fmtNaira(livePricing.resellerPrice * 10)} (10 PINs @ ${fmtNaira(livePricing.resellerPrice)})`;
+        if (singleFields) singleFields.style.display = 'none';
+        if (discountBadge) discountBadge.style.display = 'none';
+      } else {
+        document.getElementById('checkoutTitle').textContent = 'Buy Student Activation PIN';
+        if (singleFields) singleFields.style.display = 'block';
+        updateReferralDiscount();
+      }
+      document.getElementById('checkoutModal').classList.add('open');
+    }
+
+    function updateReferralDiscount() {
+      if (currentCheckoutMode !== 'single') return;
+      const refInput = document.getElementById('referralInput');
+      const badge = document.getElementById('discountBadge');
+      const code = (refInput ? refInput.value : '').trim().toUpperCase();
+      const discount = livePricing.standardPrice - livePricing.referredPrice;
+      if (/^JAMB-[A-Z0-9]{6}$/.test(code)) {
+        document.getElementById('modalAmount').textContent = `${fmtNaira(livePricing.referredPrice)} (Save ${fmtNaira(discount)})`;
+        if (badge) {
+          badge.textContent = `✓ ${fmtNaira(discount)} referral discount applied (referrer earns ${fmtNaira(livePricing.referralReward)})`;
+          badge.style.display = 'block';
+        }
+      } else {
+        document.getElementById('modalAmount').textContent = fmtNaira(livePricing.standardPrice);
+        if (badge) badge.style.display = 'none';
+      }
+    }
+
+    function closeCheckout() {
+      document.getElementById('checkoutModal').classList.remove('open');
+    }
+
+    function simulatePin() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      const seg = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      document.getElementById('pinCode').textContent = `${seg()}-${seg()}-${seg()}`;
+      document.getElementById('pinResult').style.display = 'block';
+    }
+
+    function showInstallHelper() {
+      setTimeout(() => {
+        document.getElementById('downloadModal').classList.add('open');
+      }, 300);
+    }
+  </script>
+</body>
+
+</html>
