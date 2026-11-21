@@ -8,6 +8,7 @@ const {
   resolveCheckoutOrder,
   sendJson,
 } = require('../lib/passforge');
+const { recordConfirmedSinglePurchase } = require('../lib/fulfillment');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
@@ -114,6 +115,20 @@ module.exports = async function handler(req, res) {
     }
 
     const activationPin = generateActivationPin(expected.productKey, secretSalt);
+
+    // Best-effort install/activation stat recording + license & referral crediting;
+    // never fail payment fulfillment if Redis errs.
+    try {
+      await recordConfirmedSinglePurchase({
+        productKey: expected.productKey,
+        activationPin,
+        reference: tx.reference,
+        paidAt: tx.paid_at || tx.transaction_date || null,
+        referralCode: expected.referralCode,
+        referralReward: expected.referralReward,
+      });
+    } catch (_) { }
+
     return sendJson(res, 200, {
       verified: true,
       mode: 'single',

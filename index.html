@@ -5,6 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PassForge — Offline UTME &amp; CBT Prep + Hands-Free Jarvis AI</title>
+  <link rel="icon" type="image/png" href="app-icon.png" />
+  <link rel="apple-touch-icon" href="app-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -86,13 +88,14 @@
       white-space: nowrap;
     }
 
-    .brand-orb {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
       flex-shrink: 0;
-      background: radial-gradient(circle at 35% 30%, #e9d5ff, #7c3aed 65%, #3b0764);
-      box-shadow: 0 0 18px var(--accent-glow);
+      object-fit: cover;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      box-shadow: 0 0 14px var(--accent-glow);
     }
 
     .nav-links {
@@ -477,7 +480,7 @@
     /* Real Screenshots Carousel */
     .gallery-scroll {
       display: grid;
-      grid-template-columns: repeat(5, minmax(220px, 1fr));
+      grid-template-columns: repeat(7, minmax(220px, 1fr));
       gap: 16px;
       overflow-x: auto;
       padding-bottom: 12px;
@@ -856,9 +859,10 @@
         gap: 8px;
       }
 
-      .brand-orb {
-        width: 24px;
-        height: 24px;
+      .brand-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
       }
 
       .nav-cta {
@@ -913,7 +917,7 @@
   <header>
     <div class="container nav">
       <a class="brand" href="#">
-        <div class="brand-orb"></div>
+        <img class="brand-icon" src="app-icon.png" alt="PassForge App Icon" />
         <span>PassForge <span style="color:var(--accent)">UTME</span></span>
       </a>
       <nav class="nav-links">
@@ -999,15 +1003,15 @@
       </div>
 
       <div class="gallery-scroll">
-        <div class="shot-card" onclick="openLightboxCard(this, 'Smart Study Dashboard &amp; 18 Subject Dictionaries')">
+        <div class="shot-card" onclick="openLightboxCard(this, 'Smart Study Home, Learning Games &amp; 18 Subject Dictionaries')">
           <div class="shot-img-wrap">
-            <img src="screenshots/screen_1_home.png"
+            <img src="screenshots/screen_1_home.png?v=2"
               onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
               alt="Home Dashboard Screenshot" />
           </div>
           <div class="shot-meta">
             <strong>1. Smart Study Home</strong>
-            <span>Streak tracker, accuracy badge, 1-tap Continue Practice &amp; 18 Subject Dictionaries.</span>
+            <span>Streak tracker, Continue Practice, Piano Tiles &amp; Scholar Millions, World Atlas, plus 18 Subject Dictionaries.</span>
           </div>
         </div>
 
@@ -1027,7 +1031,7 @@
         <div class="shot-card"
           onclick="openLightboxCard(this, 'Jarvis AI Tutor — Voice Input &amp; Hands-Free App Navigation')">
           <div class="shot-img-wrap">
-            <img src="screenshots/screen_3_jarvis.png"
+            <img src="screenshots/screen_3_jarvis.png?v=2"
               onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
               alt="Jarvis AI Overlay Screenshot" />
           </div>
@@ -1051,13 +1055,37 @@
 
         <div class="shot-card" onclick="openLightboxCard(this, 'Custom 4-Subject UTME Mock, Topic &amp; Year Drill')">
           <div class="shot-img-wrap">
-            <img src="screenshots/screen_5_practice.png"
+            <img src="screenshots/screen_5_practice.png?v=2"
               onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
               alt="Practice Setup Screenshot" />
           </div>
           <div class="shot-meta">
             <strong>5. Custom Study Setup</strong>
             <span>Pick up to 4 subjects, 1992–2025 years, specific syllabus topics, question count &amp; timer.</span>
+          </div>
+        </div>
+
+        <div class="shot-card" onclick="openLightboxCard(this, '18 Subject Dictionaries &amp; LaTeX Formula Vaults')">
+          <div class="shot-img-wrap">
+            <img src="screenshots/screen_7_dictionary.png"
+              onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
+              alt="Subject Dictionary Formula Screenshot" />
+          </div>
+          <div class="shot-meta">
+            <strong>6. 18 Subject Dictionaries</strong>
+            <span>Instant offline definitions &amp; LaTeX formulas across Maths, Physics, Chemistry &amp; more.</span>
+          </div>
+        </div>
+
+        <div class="shot-card" onclick="openLightboxCard(this, '2027 Compulsory Literature Texts &amp; Chapter Summaries')">
+          <div class="shot-img-wrap">
+            <img src="screenshots/screen_8_literature.png"
+              onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
+              alt="JAMB Literature Text Screenshot" />
+          </div>
+          <div class="shot-meta">
+            <strong>7. 2027 Literature Vault</strong>
+            <span>Complete chapter summaries, character guides &amp; themes for texts like The Lekki Headmaster.</span>
           </div>
         </div>
       </div>
@@ -1191,6 +1219,24 @@
           <p>Includes <em>So the Path Does Not Die</em>, <em>Redemption Road</em>, <em>Path of Lucas</em>, <em>To Kill a
               Mockingbird</em>, <em>Antony and Cleopatra</em>, <em>An Inspector Calls</em>, <em>The Marriage of
               Anansewa</em>, <em>Once Upon an Elephant</em> &amp; 11 JAMB poems.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🌍</div>
+          <h3>Interactive 3D → 2D World Atlas</h3>
+          <p>Spin a live 3D globe offline, tap any country to zoom into a crisp 2D map with capitals and major cities,
+            built right into Geography study.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🎹</div>
+          <h3>Piano Tiles &amp; Scholar Millions</h3>
+          <p>Recharge between study blocks with multi-touch Piano Tiles (plus cloud playlists) and test your UTME speed
+            on the ₦20M Scholar Millions quiz ladder.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🎙️</div>
+          <h3>3-Second Hands-Free Voice Loop</h3>
+          <p>Hold Jarvis's orb for 3 seconds anywhere in the app to talk hands-free, tap the green orb to send
+            instantly, and get crisp audio tutoring.</p>
         </div>
       </div>
     </section>
@@ -1685,6 +1731,11 @@
       const params = new URLSearchParams(window.location.search);
       const ref = params.get('reference') || params.get('trxref');
       const openMode = params.get('open_checkout');
+      const presetKey = (params.get('key') || '').trim().toUpperCase();
+      const keyInput = document.getElementById('deviceKeyInput');
+      if (keyInput && presetKey) {
+        keyInput.value = presetKey;
+      }
       if (ref) {
         openCheckout('single');
         document.getElementById('manualRefInput').value = ref;

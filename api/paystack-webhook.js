@@ -8,6 +8,7 @@ const {
   sendJson,
   verifyPaystackSignature,
 } = require('../lib/passforge');
+const { recordConfirmedSinglePurchase } = require('../lib/fulfillment');
 
 async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -83,6 +84,16 @@ async function handler(req, res) {
       activationPin: pin,
       formattedPin: formatDisplayPin(pin),
     };
+    try {
+      await recordConfirmedSinglePurchase({
+        productKey: expected.productKey,
+        activationPin: pin,
+        reference: tx.reference,
+        paidAt: fulfillment.paidAt,
+        referralCode: expected.referralCode,
+        referralReward: expected.referralReward,
+      });
+    } catch (_) {}
   }
 
   // Log operational audit summary without exposing secret salt or full PIN in Vercel logs.
