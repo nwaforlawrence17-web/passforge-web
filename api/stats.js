@@ -2,10 +2,13 @@ const crypto = require('crypto');
 const {
   normalizeProductKey,
   normalizeReferralCode,
+  normalizeResellerOrderCode,
+  normalizeVoucherCode,
   readJsonBody,
   sendJson,
   utcDateKey,
 } = require('../lib/passforge');
+const { getOrderSummary } = require('../lib/reseller');
 const { getRedisConfig, redisCommand, redisPipeline } = require('../lib/redis');
 
 function timingSafeMatch(a, b) {
@@ -172,6 +175,29 @@ module.exports = async function handler(req, res) {
         });
       }
 
+      const resellerCode = normalizeResellerOrderCode(lookupRaw);
+      if (resellerCode) {
+        const summary = await getOrderSummary(resellerCode);
+        return sendJson(res, 200, {
+          ok: true,
+          lookupType: 'reseller',
+          resellerCode,
+          summary,
+        });
+      }
+
+      const voucherCode = normalizeVoucherCode(lookupRaw);
+      if (voucherCode) {
+        const rawVoucher = await redisCommand(['GET', `voucher:${voucherCode}`]);
+        const voucher = safeJsonParse(rawVoucher);
+        return sendJson(res, 200, {
+          ok: true,
+          lookupType: 'voucher',
+          voucherCode,
+          voucher,
+        });
+      }
+
       const productKey = normalizeProductKey(lookupRaw);
       if (productKey) {
         const rawLic = await redisCommand(['GET', `license:key:${productKey}`]);
@@ -186,7 +212,7 @@ module.exports = async function handler(req, res) {
 
       return sendJson(res, 400, {
         error: 'INVALID_LOOKUP',
-        message: 'Enter a valid Product Key (XXX-XXX-XXX) or Referral Code (JAMB-XXXXXX).',
+        message: 'Enter a Product Key (XXX-XXX-XXX), Referral Code (JAMB-XXXXXX), Reseller Code (RES-...), or Scratch PIN (PF-...).',
       });
     } catch (err) {
       return sendJson(res, 502, {
@@ -211,6 +237,8 @@ module.exports = async function handler(req, res) {
     ['GET', 'stats:devices:platform:other'],
     ['LRANGE', 'wallet:withdrawals:pending', 0, 99],
     ['LRANGE', 'wallet:withdrawals:paid', 0, 49],
+    ['GET', 'stats:reseller:orders:total'],
+    ['GET', 'stats:reseller:units:total'],
   ];
 
   for (const d of days) {
@@ -236,9 +264,11 @@ module.exports = async function handler(req, res) {
     const paidWithdrawals = (Array.isArray(results[6]) ? results[6] : [])
       .map(safeJsonParse)
       .filter(Boolean);
+    const totalResellerOrders = Number(results[7] || 0);
+    const totalResellerUnits = Number(results[8] || 0);
 
     const last7Days = days.map((date, idx) => {
-      const base = 7 + idx * 3;
+      const base = 9 + idx * 3;
       return {
         date,
         newInstalls: Number(results[base] || 0),
@@ -252,6 +282,8 @@ module.exports = async function handler(req, res) {
       generatedAt: new Date(now).toISOString(),
       totalUniqueDevices,
       totalPaidActivations,
+      totalResellerOrders,
+      totalResellerUnits,
       today: last7Days[0],
       platforms,
       last7Days,

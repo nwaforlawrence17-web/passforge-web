@@ -948,7 +948,7 @@
               href="https://github.com/nwaforlawrence17-web/passforge-web/releases/download/v1.0.0/PassForge-UTME-2027.apk"
               onclick="showInstallHelper()">
               <span>⬇ Download Free Android APK</span>
-              <span style="font-size:12px;opacity:.8;font-weight:700;">v1.0 · 71.6 MB · 72h Trial</span>
+              <span style="font-size:12px;opacity:.8;font-weight:700;">v1.0 · 76.4 MB · 72h Trial</span>
             </a>
             <button class="btn-secondary" id="heroBuyBtn" onclick="openCheckout('single')">
               🔑 Buy Activation PIN (₦2,500)
@@ -1319,17 +1319,20 @@
         <div class="price-card">
           <div>
             <div class="pill" style="margin-bottom:8px;">CAFÉS &amp; LESSON CENTERS</div>
-            <h3>Reseller Bulk Pack (10+ PINs)</h3>
+            <h3>Reseller Bulk Packs (10 / 25 / 50 PINs)</h3>
             <div class="price" id="resellerCardPrice">₦1,500 <span>/ PIN (keep ₦1,000/sale)</span></div>
             <ul class="list">
-              <li>Buy 10, 25, or 50 activation PINs at ₦1,500 each</li>
+              <li>Choose <strong>10, 25, or 50 activation PINs</strong> at ₦1,500 each</li>
+              <li>Issue <strong>Direct Offline PINs</strong> or mint <strong>Copy &amp; Sell Scratch PINs</strong></li>
               <li>Sell to students at ₦2,500 &amp; keep <strong>₦1,000 profit per PIN</strong></li>
-              <li>Each PIN locks cleanly to 1 student Android device</li>
-              <li>Delivered instantly after transfer confirmation</li>
+              <li>Instant credits unlocked in your <a href="reseller.html" style="color:var(--accent);font-weight:700;text-decoration:none;">Reseller Portal</a></li>
             </ul>
           </div>
-          <button class="btn-secondary" style="justify-content:center;" onclick="openCheckout('reseller')">Order Bulk
-            Reseller PINs</button>
+          <div style="display:grid;gap:8px;">
+            <button class="btn-secondary" style="justify-content:center;" onclick="openCheckout('reseller')">Order Bulk
+              Reseller PINs</button>
+            <a class="btn-secondary" style="justify-content:center;font-size:12.5px;padding:9px 14px;" href="reseller.html">Already Purchased? Open Reseller Portal →</a>
+          </div>
         </div>
       </div>
     </section>
@@ -1364,7 +1367,7 @@
       <div>© 2026–2027 PassForge · Offline CBT Suite (UTME · WAEC/NECO · JUPEB · IJMB · BECE · ICAN · Bar)</div>
       <div class="footer-links">
         <a href="#faq">Support &amp; WhatsApp</a>
-        <a href="#pricing">Reseller Terms</a>
+        <a href="reseller.html">Reseller Portal</a>
         <a href="#install">Install Guide</a>
       </div>
     </div>
@@ -1393,10 +1396,18 @@
       <button class="close-btn" onclick="closeCheckout()">✕</button>
       <div class="mock-label" id="checkoutTag">INSTANT PAYSTACK CHECKOUT · CARD / TRANSFER / USSD</div>
       <h3 id="checkoutTitle" style="font-size:20px;margin-bottom:6px;">Buy Student Activation PIN</h3>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Enter your email/WhatsApp and your app's Product
+      <p id="checkoutSubtitle" style="font-size:13px;color:var(--muted);margin-bottom:12px;">Enter your email/WhatsApp and your app's Product
         Key to unlock your device-locked Activation PIN immediately after payment.</p>
-      <label style="font-size:12px;color:var(--muted);">Student Email or WhatsApp Number</label>
+      <label id="buyerInputLabel" style="font-size:12px;color:var(--muted);">Student Email or WhatsApp Number</label>
       <input class="input" id="buyerInput" placeholder="e.g. student@gmail.com or 0803..." />
+      <div id="resellerPackFields" style="display:none;margin-bottom:10px;">
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Select Reseller Pack Size</label>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          <button type="button" class="btn-secondary pack-size-btn" data-units="10" style="justify-content:center;padding:10px 8px;font-size:13px;" onclick="selectResellerUnits(10)">10 PINs<br/><span id="packPrice10" style="font-size:11px;color:var(--accent);">₦15,000</span></button>
+          <button type="button" class="btn-secondary pack-size-btn" data-units="25" style="justify-content:center;padding:10px 8px;font-size:13px;" onclick="selectResellerUnits(25)">25 PINs<br/><span id="packPrice25" style="font-size:11px;color:var(--accent);">₦37,500</span></button>
+          <button type="button" class="btn-secondary pack-size-btn" data-units="50" style="justify-content:center;padding:10px 8px;font-size:13px;" onclick="selectResellerUnits(50)">50 PINs<br/><span id="packPrice50" style="font-size:11px;color:var(--accent);">₦75,000</span></button>
+        </div>
+      </div>
       <div id="singleStudentFields">
         <label style="font-size:12px;color:var(--muted);">App Product Key (from Activation Hub in App)</label>
         <input class="input" id="deviceKeyInput" placeholder="e.g. K8M-4P2-9X7"
@@ -1424,10 +1435,16 @@
           ACTIVATION PIN READY</div>
         <div id="pinCode" style="font-family:var(--mono);font-size:18px;font-weight:700;margin-top:4px;"></div>
         <div id="pinMeta" style="font-size:12px;color:var(--muted);margin-top:6px;"></div>
-        <button class="btn-secondary" id="copyPinBtn" type="button"
-          style="margin-top:10px;padding:8px 14px;font-size:12px;display:none;" onclick="copyVerifiedPin()">
-          Copy Activation PIN
-        </button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+          <button class="btn-secondary" id="copyPinBtn" type="button"
+            style="padding:8px 14px;font-size:12px;display:none;" onclick="copyVerifiedPin()">
+            Copy Activation PIN
+          </button>
+          <a class="btn-primary" id="openResellerPortalLink" href="reseller.html"
+            style="padding:8px 14px;font-size:12px;display:none;">
+            Open Reseller Portal →
+          </a>
+        </div>
       </div>
       <details style="margin-top:14px;font-size:12px;color:var(--muted);">
         <summary style="cursor:pointer;">Already paid? Verify Paystack Reference</summary>
@@ -1446,7 +1463,7 @@
     onclick="if(event.target===this) document.getElementById('downloadModal').classList.remove('open')">
     <div class="modal">
       <button class="close-btn" onclick="document.getElementById('downloadModal').classList.remove('open')">✕</button>
-      <div class="mock-label">DOWNLOAD STARTED · PASSFORGE UTME 2027 (71.6 MB)</div>
+      <div class="mock-label">DOWNLOAD STARTED · PASSFORGE UTME 2027 (76.4 MB)</div>
       <h3 style="font-size:20px;margin-bottom:8px;">Installing PassForge APK on Android</h3>
       <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
         Your direct APK download is starting now. When Chrome finishes:
@@ -1455,7 +1472,7 @@
         <strong>Install</strong>.
       </p>
       <div class="va-box" style="font-size:12px;">
-        Package: PassForge UTME 2027 (v1.0.0 · 71.6 MB)<br />
+        Package: PassForge UTME 2027 (v1.0.0 · 76.4 MB)<br />
         Includes: 28,333 Qs · 18 Subjects · 72h Full Free Trial
       </div>
       <a class="btn-primary" style="width:100%;justify-content:center;"
@@ -1546,6 +1563,7 @@
 
     const VERCEL_CHECKOUT_URL = 'https://passforge-utme.vercel.app';
     let lastVerifiedPin = '';
+    let currentResellerUnits = 10;
 
     function getApiBaseUrl() {
       const host = window.location.hostname || '';
@@ -1565,19 +1583,50 @@
       }
     }
 
+    function selectResellerUnits(units) {
+      currentResellerUnits = [10, 25, 50].includes(Number(units)) ? Number(units) : 10;
+      document.querySelectorAll('.pack-size-btn').forEach((btn) => {
+        const selected = Number(btn.getAttribute('data-units')) === currentResellerUnits;
+        btn.style.borderColor = selected ? 'var(--accent)' : 'var(--border)';
+        btn.style.background = selected ? 'rgba(124, 58, 237, 0.22)' : 'var(--surface-2)';
+      });
+      const p10 = document.getElementById('packPrice10');
+      const p25 = document.getElementById('packPrice25');
+      const p50 = document.getElementById('packPrice50');
+      if (p10) p10.textContent = fmtNaira(livePricing.resellerPrice * 10);
+      if (p25) p25.textContent = fmtNaira(livePricing.resellerPrice * 25);
+      if (p50) p50.textContent = fmtNaira(livePricing.resellerPrice * 50);
+
+      if (currentCheckoutMode === 'reseller') {
+        const total = livePricing.resellerPrice * currentResellerUnits;
+        document.getElementById('checkoutTitle').textContent = `Order ${currentResellerUnits} Reseller Bulk PINs`;
+        document.getElementById('modalAmount').textContent = `${fmtNaira(total)} (${currentResellerUnits} PINs @ ${fmtNaira(livePricing.resellerPrice)})`;
+      }
+    }
+
     function openCheckout(mode) {
       currentCheckoutMode = mode;
       showCheckoutError('');
       document.getElementById('pinResult').style.display = 'none';
+      const portalLink = document.getElementById('openResellerPortalLink');
+      if (portalLink) portalLink.style.display = 'none';
       const singleFields = document.getElementById('singleStudentFields');
+      const resellerFields = document.getElementById('resellerPackFields');
       const discountBadge = document.getElementById('discountBadge');
+      const subtitle = document.getElementById('checkoutSubtitle');
+      const buyerLabel = document.getElementById('buyerInputLabel');
       if (mode === 'reseller') {
-        document.getElementById('checkoutTitle').textContent = 'Order 10 Reseller Bulk PINs';
-        document.getElementById('modalAmount').textContent = `${fmtNaira(livePricing.resellerPrice * 10)} (10 PINs @ ${fmtNaira(livePricing.resellerPrice)})`;
+        if (subtitle) subtitle.textContent = 'Select a bulk pack size (10, 25, or 50 PINs). After payment you receive a Reseller Order Code for our Portal (Direct Offline PINs + Copy & Sell Scratch PINs).';
+        if (buyerLabel) buyerLabel.textContent = 'Reseller Email or WhatsApp Number';
+        if (resellerFields) resellerFields.style.display = 'block';
         if (singleFields) singleFields.style.display = 'none';
         if (discountBadge) discountBadge.style.display = 'none';
+        selectResellerUnits(currentResellerUnits);
       } else {
         document.getElementById('checkoutTitle').textContent = 'Buy Student Activation PIN';
+        if (subtitle) subtitle.textContent = "Enter your email/WhatsApp and your app's Product Key to unlock your device-locked Activation PIN immediately after payment.";
+        if (buyerLabel) buyerLabel.textContent = 'Student Email or WhatsApp Number';
+        if (resellerFields) resellerFields.style.display = 'none';
         if (singleFields) singleFields.style.display = 'block';
         updateReferralDiscount();
       }
@@ -1643,6 +1692,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             mode: currentCheckoutMode,
+            units: currentCheckoutMode === 'reseller' ? currentResellerUnits : 1,
             buyerContact,
             productKey: currentCheckoutMode === 'single' ? productKeyRaw : '',
             referralCode: currentCheckoutMode === 'single' ? referralCode : ''
@@ -1694,13 +1744,20 @@
         }
 
         if (data.mode === 'reseller') {
-          statusLabel.textContent = 'RESELLER ORDER VERIFIED · 10-PIN PACK';
+          statusLabel.textContent = `RESELLER ORDER VERIFIED · ${data.units || 10}-PIN PACK`;
           pinCodeEl.textContent = data.resellerOrderCode;
           lastVerifiedPin = data.resellerOrderCode;
-          pinMetaEl.textContent = `Paid ${fmtNaira(data.amountNaira)} · Ref ${data.reference}. Send each student's App Product Key with this order code to generate all 10 device PINs.`;
+          pinMetaEl.textContent = `Paid ${fmtNaira(data.amountNaira)} · Ref ${data.reference}. Open the Reseller Portal to issue Direct Offline PINs or mint Copy & Sell Scratch PINs for all ${data.units || 10} credits.`;
           copyBtn.textContent = 'Copy Order Code';
           copyBtn.style.display = 'inline-flex';
+          const portalLink = document.getElementById('openResellerPortalLink');
+          if (portalLink) {
+            portalLink.href = data.portalUrl || `reseller.html?code=${encodeURIComponent(data.resellerOrderCode)}`;
+            portalLink.style.display = 'inline-flex';
+          }
         } else {
+          const portalLink = document.getElementById('openResellerPortalLink');
+          if (portalLink) portalLink.style.display = 'none';
           statusLabel.textContent = `PAYMENT VERIFIED (${fmtNaira(data.amountNaira)}) · ACTIVATION PIN READY`;
           pinCodeEl.textContent = data.formattedPin || data.activationPin;
           lastVerifiedPin = data.activationPin;

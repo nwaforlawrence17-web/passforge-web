@@ -9,6 +9,7 @@ const {
   verifyPaystackSignature,
 } = require('../lib/passforge');
 const { recordConfirmedSinglePurchase } = require('../lib/fulfillment');
+const { recordConfirmedResellerPurchase } = require('../lib/reseller');
 
 async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -47,6 +48,7 @@ async function handler(req, res) {
     mode: meta.mode,
     productKey: meta.productKey,
     referralCode: meta.referralCode,
+    units: meta.units,
   });
 
   if (!expected.ok || (tx.currency || '').toUpperCase() !== 'NGN' || Number(tx.amount) < expected.amountKobo) {
@@ -69,10 +71,23 @@ async function handler(req, res) {
   };
 
   if (expected.mode === 'reseller') {
+    const orderCode = generateResellerOrderCode(tx.reference, secretSalt || secretKey);
+    try {
+      await recordConfirmedResellerPurchase({
+        orderCode,
+        reference: tx.reference,
+        units: expected.units,
+        amountNaira: fulfillment.amountNaira,
+        buyerContact: fulfillment.buyerContact,
+        paidAt: fulfillment.paidAt,
+      });
+    } catch (recErr) {
+      console.warn('[paystack-webhook] reseller Redis record failed:', recErr.message);
+    }
     fulfillment = {
       ...fulfillment,
       units: expected.units,
-      resellerOrderCode: generateResellerOrderCode(tx.reference, secretSalt || secretKey),
+      resellerOrderCode: orderCode,
     };
   } else if (secretSalt) {
     const pin = generateActivationPin(expected.productKey, secretSalt);

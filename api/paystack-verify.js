@@ -9,6 +9,7 @@ const {
   sendJson,
 } = require('../lib/passforge');
 const { recordConfirmedSinglePurchase } = require('../lib/fulfillment');
+const { recordConfirmedResellerPurchase } = require('../lib/reseller');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
@@ -73,6 +74,7 @@ module.exports = async function handler(req, res) {
       mode: meta.mode,
       productKey: meta.productKey,
       referralCode: meta.referralCode,
+      units: meta.units,
     });
 
     if (!expected.ok) {
@@ -93,15 +95,35 @@ module.exports = async function handler(req, res) {
 
     const secretSalt = process.env.PIN_SECRET_SALT;
     if (expected.mode === 'reseller') {
+      const orderCode = generateResellerOrderCode(tx.reference, secretSalt || secretKey);
+      const buyerContact = meta.buyerContact || (tx.customer && tx.customer.email) || '';
+      const paidAt = tx.paid_at || tx.transaction_date || null;
+      const amountNaira = Number(tx.amount) / 100;
+      let creditsRecorded = false;
+      try {
+        const recordedRes = await recordConfirmedResellerPurchase({
+          orderCode,
+          reference: tx.reference,
+          units: expected.units,
+          amountNaira,
+          buyerContact,
+          paidAt,
+        });
+        creditsRecorded = Boolean(recordedRes && recordedRes.recorded);
+      } catch (recErr) {
+        console.warn('[paystack-verify] reseller Redis record failed:', recErr.message);
+      }
       return sendJson(res, 200, {
         verified: true,
         mode: 'reseller',
         reference: tx.reference,
-        amountNaira: Number(tx.amount) / 100,
+        amountNaira,
         units: expected.units,
-        resellerOrderCode: generateResellerOrderCode(tx.reference, secretSalt || secretKey),
-        buyerContact: meta.buyerContact || (tx.customer && tx.customer.email) || '',
-        paidAt: tx.paid_at || tx.transaction_date || null,
+        resellerOrderCode: orderCode,
+        creditsRecorded,
+        portalUrl: `/reseller.html?code=${encodeURIComponent(orderCode)}`,
+        buyerContact,
+        paidAt,
       });
     }
 

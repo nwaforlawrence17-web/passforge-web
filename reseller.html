@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PassForge Reseller Portal — Issue Offline &amp; Scratch Activation PINs</title>
+  <link rel="icon" type="image/png" href="app-icon.png" />
+  <link rel="apple-touch-icon" href="app-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #121214;
+      --surface: #1e1e22;
+      --surface-2: #26262c;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #a78bfa;
+      --accent-strong: #7c3aed;
+      --accent-glow: rgba(167, 139, 250, 0.22);
+      --emerald: #34d399;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(900px 500px at 85% -5%, rgba(124, 58, 237, 0.22), transparent 60%),
+        radial-gradient(700px 420px at 10% 15%, rgba(52, 211, 153, 0.08), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(18, 18, 20, 0.85);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 0;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .brand img {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      text-decoration: none;
+      transition: 0.18s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-strong), #6d28d9);
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn-primary:disabled,
+    .btn-secondary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(167, 139, 250, 0.45);
+    }
+
+    .btn-sm {
+      padding: 6px 11px;
+      font-size: 12px;
+      border-radius: 9px;
+    }
+
+    main {
+      padding: 28px 0 64px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: rgba(167, 139, 250, 0.14);
+      color: var(--accent);
+      border: 1px solid rgba(167, 139, 250, 0.3);
+    }
+
+    .pill-emerald {
+      background: rgba(52, 211, 153, 0.14);
+      color: var(--emerald);
+      border-color: rgba(52, 211, 153, 0.35);
+    }
+
+    .pill-amber {
+      background: rgba(251, 191, 36, 0.14);
+      color: var(--amber);
+      border-color: rgba(251, 191, 36, 0.35);
+    }
+
+    .pill-rose {
+      background: rgba(251, 113, 133, 0.14);
+      color: var(--rose);
+      border-color: rgba(251, 113, 133, 0.35);
+    }
+
+    h1 {
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin: 8px 0 6px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .lookup-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .mono {
+      font-family: var(--mono);
+    }
+
+    .alert {
+      margin-top: 12px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .alert-error {
+      background: rgba(251, 113, 133, 0.12);
+      border: 1px solid rgba(251, 113, 133, 0.35);
+      color: #fda4af;
+    }
+
+    .alert-success {
+      background: rgba(52, 211, 153, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      color: #6ee7b7;
+    }
+
+    /* Credits Strip */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 12px;
+    }
+
+    .stat-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    /* Guidance Note */
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .guide-col {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .guide-col h3 {
+      font-size: 15px;
+      margin: 8px 0 8px;
+    }
+
+    .guide-col ol {
+      padding-left: 18px;
+      font-size: 13px;
+      color: #d1d5db;
+      display: grid;
+      gap: 6px;
+    }
+
+    .guide-rules {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(167, 139, 250, 0.08);
+      border: 1px solid rgba(167, 139, 250, 0.25);
+      font-size: 13px;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: var(--surface-2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 9px 15px;
+      border-radius: 11px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.16s ease;
+    }
+
+    .tab-btn.active {
+      background: rgba(124, 58, 237, 0.22);
+      color: var(--text);
+      border-color: rgba(167, 139, 250, 0.55);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    label.field-label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .chip-btn {
+      padding: 6px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .chip-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .result-card {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(52, 211, 153, 0.08);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      display: none;
+    }
+
+    .pin-display {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--emerald);
+      letter-spacing: 0.05em;
+      margin: 6px 0;
+    }
+
+    .voucher-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .voucher-slip {
+      background: var(--surface);
+      border: 1px dashed rgba(167, 139, 250, 0.45);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .voucher-slip .code {
+      font-family: var(--mono);
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--text);
+      margin: 4px 0;
+    }
+
+    /* History Table */
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Print Voucher Slips */
+    @media print {
+      body {
+        background: #fff;
+        color: #111;
+      }
+
+      header,
+      #lookupCard,
+      #creditsCard,
+      #guideCard,
+      #tabsCard .tabs,
+      #tabDirect,
+      #mintFormArea,
+      #historyCard,
+      .no-print {
+        display: none !important;
+      }
+
+      .card,
+      .result-card,
+      .voucher-slip {
+        background: #fff !important;
+        color: #111 !important;
+        border: 1px solid #333 !important;
+        box-shadow: none !important;
+      }
+
+      .voucher-slip .code {
+        color: #000 !important;
+        font-size: 16px !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img src="app-icon.png" alt="PassForge" />
+        <span>PassForge Reseller Portal</span>
+      </a>
+      <div class="nav-actions">
+        <a class="btn-secondary btn-sm" href="index.html">← Back to Website</a>
+        <a class="btn-primary btn-sm" href="index.html?open_checkout=reseller">Buy Bulk Pack (10 / 25 / 50)</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Order Lookup -->
+    <section class="card" id="lookupCard">
+      <span class="pill">DUAL-MODE RESELLER DASHBOARD</span>
+      <h1>Generate &amp; Track Your Student PINs</h1>
+      <p class="muted">
+        Enter your <strong>Reseller Order Code</strong> (<span class="mono">RES-XXXX-XXXX-XXXX</span>) or your
+        <strong>Paystack Payment Reference</strong> to load your PIN credits.
+      </p>
+      <div class="lookup-row">
+        <input class="input mono" id="orderCodeInput" style="flex:1;min-width:240px;text-transform:uppercase;"
+          placeholder="e.g. RES-A1B2-C3D4-E5F6 or Paystack Reference"
+          onkeydown="if(event.key==='Enter') loadOrderSummary()" />
+        <button class="btn-primary" id="loadOrderBtn" onclick="loadOrderSummary()">Load Order</button>
+      </div>
+      <div class="alert alert-error" id="portalError"></div>
+      <div class="alert alert-success" id="portalToast"></div>
+    </section>
+
+    <!-- Live Order Credit Strip -->
+    <section class="card" id="creditsCard" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+        <div>
+          <span class="pill pill-emerald">VERIFIED RESELLER ORDER</span>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap;">
+            <span class="mono" id="loadedOrderCode" style="font-size:18px;font-weight:800;">—</span>
+            <button class="btn-secondary btn-sm" onclick="copyText(currentOrderCode, 'Order Code copied!')">Copy Code</button>
+          </div>
+        </div>
+        <button class="btn-secondary btn-sm" onclick="loadOrderSummary(currentOrderCode, true)">↻ Refresh Live Status</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">Remaining Credits</div>
+          <div class="stat-value" id="statRemaining" style="color:var(--emerald);">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Pack Size Used</div>
+          <div class="stat-value" id="statUsedRatio">0 / 0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Option 1 · Direct PINs</div>
+          <div class="stat-value" id="statDirect">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Option 2 · Scratch PINs</div>
+          <div class="stat-value" id="statScratch">0 (0 used)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Plain-English Reseller Guidance Note -->
+    <section class="card" id="guideCard">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div>
+          <span class="pill pill-amber">RESELLER GUIDANCE NOTE</span>
+          <h2 style="font-size:19px;margin-top:8px;">Two Ways to Sell Your PINs (Choose Whichever Suits Your Buyer)</h2>
+        </div>
+        <button class="btn-secondary btn-sm" onclick="copyStudentGuide()">Copy Student How-To for WhatsApp</button>
+      </div>
+
+      <div class="guide-grid">
+        <div class="guide-col">
+          <span class="pill pill-emerald">OPTION 1 · BEST WHEN STUDENT IS WITH YOU OR OFFLINE</span>
+          <h3>Direct Offline PIN (Needs Student's Product Key)</h3>
+          <ol>
+            <li>Ask the student to open <strong>PassForge → Activation Hub</strong> on their Android phone and send you their <strong>9-character Product Key</strong> (e.g. <span class="mono">K8M-4P2-9X7</span>).</li>
+            <li>Enter that Product Key in <strong>Direct Offline PIN</strong> below and click <strong>Generate Offline PIN</strong>.</li>
+            <li>Give them the 10-character Activation PIN. They paste it inside Activation Hub — <strong>works 100% offline with zero data</strong>.</li>
+          </ol>
+        </div>
+
+        <div class="guide-col">
+          <span class="pill">OPTION 2 · BEST FOR PRINTED SLIPS, AGENTS &amp; WHATSAPP SHOPS</span>
+          <h3>Scratch PINs (Copy &amp; Sell Ahead of Time)</h3>
+          <ol>
+            <li>Mint any quantity of Scratch PINs (<span class="mono">PF-XXXX-XXXX</span>) below without asking for anyone's Product Key first.</li>
+            <li>Print the slips or copy &amp; send the codes to buyers as stock.</li>
+            <li>When a buyer is ready, they open <strong>Activation Hub</strong> with brief mobile data/Wi‑Fi, paste their <span class="mono">PF-XXXX-XXXX</span> code, and tap <strong>Verify PIN</strong>.</li>
+            <li>Each Scratch PIN works <strong>once on 1 device only</strong> and automatically changes from <span style="color:var(--emerald);font-weight:700;">AVAILABLE</span> to <span style="color:var(--rose);font-weight:700;">USED</span> below.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="guide-rules">
+        <span>
+          <strong>Smart Tip:</strong> You can mix &amp; match both options from the same credit balance (e.g. keep 10 Scratch PINs printed in your shop and use remaining credits for walk-in offline students). Recommended selling price: <strong>₦2,500</strong> (your cost: <strong>₦1,500</strong> -> <strong>₦1,000 profit per student</strong>).
+        </span>
+      </div>
+    </section>
+
+    <!-- Action Tabs (Shown when an order is loaded) -->
+    <section class="card" id="tabsCard" style="display:none;">
+      <div class="tabs">
+        <button class="tab-btn active" id="tabBtnDirect" onclick="switchTab('direct')">Option 1: Direct Offline PIN</button>
+        <button class="tab-btn" id="tabBtnScratch" onclick="switchTab('scratch')">Option 2: Copy &amp; Sell Scratch PINs</button>
+      </div>
+
+      <!-- TAB 1: Direct Offline PIN -->
+      <div id="tabDirect">
+        <p class="muted" style="margin-bottom:14px;">
+          Enter a student's App Product Key to generate an Activation PIN locked permanently to their phone (student does not need internet to activate).
+        </p>
+        <div class="form-grid">
+          <div>
+            <label class="field-label">Student's App Product Key</label>
+            <input class="input mono" id="directKeyInput" placeholder="e.g. K8M-4P2-9X7" style="text-transform:uppercase;" />
+          </div>
+          <div>
+            <label class="field-label">Student Name / Label (Optional)</label>
+            <input class="input" id="directNoteInput" placeholder="e.g. Chidi - SS3 Science" maxlength="80" />
+          </div>
+        </div>
+        <button class="btn-primary" id="issueDirectBtn" onclick="issueDirectPin()">Generate Offline PIN (-1 Credit)</button>
+
+        <div class="result-card" id="directResultBox">
+          <div style="font-size:11px;font-weight:700;color:var(--emerald);text-transform:uppercase;">OFFLINE ACTIVATION PIN READY</div>
+          <div class="pin-display" id="directResultPin">—</div>
+          <div class="muted" id="directResultMeta" style="font-size:13px;"></div>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+            <button class="btn-secondary btn-sm" onclick="copyText(lastDirectPin, 'Activation PIN copied!')">Copy PIN</button>
+            <button class="btn-primary btn-sm" onclick="copyDirectWhatsapp()">Copy WhatsApp Message for Student</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Scratch PINs -->
+      <div id="tabScratch" style="display:none;">
+        <div id="mintFormArea">
+          <p class="muted" style="margin-bottom:12px;">
+            Mint single-use <span class="mono">PF-XXXX-XXXX</span> Scratch PINs from your credits. Copy &amp; sell them anywhere or print voucher slips.
+          </p>
+          <div class="chip-row">
+            <button class="chip-btn" type="button" onclick="setMintCount(1)">1 PIN</button>
+            <button class="chip-btn" type="button" onclick="setMintCount(5)">5 PINs</button>
+            <button class="chip-btn" type="button" onclick="setMintCount(10)">10 PINs</button>
+            <button class="chip-btn" type="button" onclick="setMintCount(25)">25 PINs</button>
+            <button class="chip-btn" type="button" onclick="setMintCount(currentRemainingCredits || 1)">All Remaining</button>
+          </div>
+          <div class="form-grid">
+            <div>
+              <label class="field-label">Quantity to Mint (1 – 50)</label>
+              <input class="input mono" id="mintCountInput" type="number" min="1" max="50" value="5" />
+            </div>
+            <div>
+              <label class="field-label">Batch Label / Shop Note (Optional)</label>
+              <input class="input" id="mintNoteInput" placeholder="e.g. Tutorial Center Batch 1" maxlength="80" />
+            </div>
+          </div>
+          <button class="btn-primary" id="mintBtn" onclick="mintScratchVouchers()">Mint Scratch PINs</button>
+        </div>
+
+        <div class="result-card" id="mintResultBox">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--emerald);text-transform:uppercase;">MINTED SCRATCH VOUCHERS READY</div>
+              <div class="muted" id="mintResultMeta" style="font-size:12.5px;"></div>
+            </div>
+            <div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn-secondary btn-sm" onclick="copyAllMintedVouchers()">Copy All PINs</button>
+              <button class="btn-secondary btn-sm" onclick="downloadVouchersCsv()">Download CSV</button>
+              <button class="btn-primary btn-sm" onclick="window.print()">Print Slips</button>
+            </div>
+          </div>
+          <div class="voucher-grid" id="mintedVoucherGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Order History Table -->
+    <section class="card" id="historyCard" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <h2 style="font-size:18px;">Issued &amp; Minted PIN Ledger</h2>
+          <p class="muted" style="font-size:12.5px;">Live status updates automatically when a student redeems a Scratch PIN inside the app.</p>
+        </div>
+        <div class="chip-row" style="margin:0;">
+          <button class="chip-btn" onclick="setHistoryFilter('all')">All</button>
+          <button class="chip-btn" onclick="setHistoryFilter('scratch')">Scratch PINs</button>
+          <button class="chip-btn" onclick="setHistoryFilter('direct')">Direct Offline PINs</button>
+          <button class="chip-btn" onclick="downloadFullLedgerCsv()">Export Ledger CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Mode</th>
+              <th>Code / PIN</th>
+              <th>Target / Label</th>
+              <th>Live Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const VERCEL_CHECKOUT_URL = 'https://passforge-utme.vercel.app';
+    let currentOrderCode = '';
+    let currentRemainingCredits = 0;
+    let currentHistory = [];
+    let historyFilter = 'all';
+    let lastDirectPin = '';
+    let lastDirectKey = '';
+    let lastDirectNote = '';
+    let lastMintedVouchers = [];
+
+    function getApiBaseUrl() {
+      if (window.location.hostname.endsWith('github.io')) return VERCEL_CHECKOUT_URL;
+      return '';
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('portalError');
+      if (!msg) {
+        box.style.display = 'none';
+        box.textContent = '';
+        return;
+      }
+      box.textContent = msg;
+      box.style.display = 'block';
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById('portalToast');
+      box.textContent = msg;
+      box.style.display = 'block';
+      clearTimeout(window.__pfToastTimer);
+      window.__pfToastTimer = setTimeout(() => {
+        box.style.display = 'none';
+      }, 2600);
+    }
+
+    async function copyText(text, successMsg) {
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(successMsg || 'Copied to clipboard!');
+      } catch (_) {
+        showError('Copy failed — please highlight and copy manually.');
+      }
+    }
+
+    function copyStudentGuide() {
+      const msg = [
+        'How to Activate PassForge UTME App:',
+        '1. Open PassForge -> tap "Activation Hub".',
+        '2. If you received a 10-character Offline PIN (e.g. A1B2-C3D4-E5), paste it directly and tap "Verify PIN" (works without data).',
+        '3. If you bought a Scratch PIN (format PF-XXXX-XXXX), turn on mobile data for 2 seconds, paste PF-XXXX-XXXX, and tap "Verify PIN". Each PIN locks permanently to 1 phone.',
+      ].join('\n');
+      copyText(msg, 'Student activation instructions copied for WhatsApp!');
+    }
+
+    function switchTab(tab) {
+      const isDirect = tab === 'direct';
+      document.getElementById('tabBtnDirect').classList.toggle('active', isDirect);
+      document.getElementById('tabBtnScratch').classList.toggle('active', !isDirect);
+      document.getElementById('tabDirect').style.display = isDirect ? 'block' : 'none';
+      document.getElementById('tabScratch').style.display = isDirect ? 'none' : 'block';
+    }
+
+    function setMintCount(val) {
+      const n = Math.max(1, Math.min(50, Number(val) || 1));
+      document.getElementById('mintCountInput').value = String(n);
+    }
+
+    function renderSummary(data) {
+      currentOrderCode = data.order.orderCode;
+      currentRemainingCredits = data.remainingCredits;
+      currentHistory = Array.isArray(data.history) ? data.history : [];
+
+      localStorage.setItem('passforge_reseller_order', currentOrderCode);
+      document.getElementById('orderCodeInput').value = currentOrderCode;
+
+      document.getElementById('loadedOrderCode').textContent = currentOrderCode;
+      document.getElementById('statRemaining').textContent = String(data.remainingCredits);
+      document.getElementById('statUsedRatio').textContent = `${data.usedCredits} / ${data.order.totalUnits}`;
+      document.getElementById('statDirect').textContent = String(data.directCount || 0);
+      document.getElementById('statScratch').textContent = `${data.voucherCount || 0} (${data.voucherUsedCount || 0} used)`;
+
+      document.getElementById('creditsCard').style.display = 'block';
+      document.getElementById('tabsCard').style.display = 'block';
+      document.getElementById('historyCard').style.display = 'block';
+      renderHistoryTable();
+    }
+
+    function setHistoryFilter(filter) {
+      historyFilter = filter;
+      renderHistoryTable();
+    }
+
+    function renderHistoryTable() {
+      const tbody = document.getElementById('historyTableBody');
+      const items = currentHistory.filter((item) => {
+        if (historyFilter === 'all') return true;
+        return item.type === historyFilter;
+      });
+
+      if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:18px;">No PINs generated yet under this filter.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = items.map((item) => {
+        const isScratch = item.type === 'scratch';
+        const codeText = isScratch ? item.voucherCode : (item.formattedPin || item.activationPin);
+        const copyVal = isScratch ? item.voucherCode : item.activationPin;
+        const targetText = isScratch
+          ? (item.redeemedProductKey ? `Redeemed: ${item.redeemedProductKey}` : (item.note || 'Unassigned stock'))
+          : `${item.productKey}${item.note ? ` (${item.note})` : ''}`;
+
+        let statusBadge = '<span class="pill">ISSUED</span>';
+        if (isScratch) {
+          statusBadge = item.status === 'USED'
+            ? '<span class="pill pill-rose">USED</span>'
+            : '<span class="pill pill-emerald">AVAILABLE</span>';
+        }
+
+        const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleString() : '—';
+        return `
+          <tr>
+            <td>${isScratch ? 'Scratch PIN' : 'Direct PIN'}</td>
+            <td class="mono" style="font-weight:700;">${escapeHtml(codeText)}</td>
+            <td>${escapeHtml(targetText)}</td>
+            <td>${statusBadge}</td>
+            <td style="color:var(--muted);">${escapeHtml(dateStr)}</td>
+            <td><button class="btn-secondary btn-sm" onclick='copyText(${JSON.stringify(copyVal)}, "Copied!")'>Copy</button></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function loadOrderSummary(explicitCode, silentToast) {
+      showError('');
+      const inputVal = (explicitCode || document.getElementById('orderCodeInput').value || '').trim();
+      if (!inputVal) {
+        return showError('Enter your Reseller Order Code (RES-XXXX-XXXX-XXXX) or Paystack reference.');
+      }
+
+      const btn = document.getElementById('loadOrderBtn');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+      try {
+        const resp = await fetch(`${getApiBaseUrl()}/api/reseller?code=${encodeURIComponent(inputVal)}`);
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.ok) {
+          return showError(data.message || 'Unable to load reseller order.');
+        }
+        renderSummary(data);
+        if (silentToast) showToast('Live status refreshed!');
+      } catch (_) {
+        showError('Network error reaching server. Please check your connection and try again.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Load Order';
+      }
+    }
+
+    async function issueDirectPin() {
+      showError('');
+      if (!currentOrderCode) return showError('Load a valid Reseller Order first.');
+
+      const productKey = (document.getElementById('directKeyInput').value || '').trim().toUpperCase();
+      const note = (document.getElementById('directNoteInput').value || '').trim();
+      if (!productKey) return showError("Enter the student's 9-character Product Key (e.g. K8M-4P2-9X7).");
+
+      const btn = document.getElementById('issueDirectBtn');
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
+      try {
+        const resp = await fetch(`${getApiBaseUrl()}/api/reseller`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'issue_direct',
+            orderCode: currentOrderCode,
+            productKey,
+            note,
+          }),
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.ok) {
+          return showError(data.message || 'Unable to generate Activation PIN.');
+        }
+
+        const item = data.item;
+        lastDirectPin = item.activationPin;
+        lastDirectKey = item.productKey;
+        lastDirectNote = item.note || '';
+
+        document.getElementById('directResultPin').textContent = item.formattedPin || item.activationPin;
+        document.getElementById('directResultMeta').textContent =
+          `Locked to Product Key ${item.productKey}${item.note ? ` · ${item.note}` : ''} · ${data.remainingCredits} credits left${data.idempotent ? ' (already issued for this key — no extra credit deducted)' : ''}`;
+        document.getElementById('directResultBox').style.display = 'block';
+
+        document.getElementById('directKeyInput').value = '';
+        document.getElementById('directNoteInput').value = '';
+        await loadOrderSummary(currentOrderCode, false);
+      } catch (_) {
+        showError('Network error issuing offline PIN.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Generate Offline PIN (-1 Credit)';
+      }
+    }
+
+    function copyDirectWhatsapp() {
+      if (!lastDirectPin) return;
+      const lines = [
+        'PassForge UTME 2027 Activation PIN',
+        lastDirectNote ? `Student: ${lastDirectNote}` : null,
+        `Product Key: ${lastDirectKey}`,
+        `Activation PIN: ${lastDirectPin}`,
+        'Open PassForge -> Activation Hub -> paste PIN -> tap Verify PIN (works 100% offline!).',
+      ].filter(Boolean);
+      copyText(lines.join('\n'), 'WhatsApp message copied!');
+    }
+
+    async function mintScratchVouchers() {
+      showError('');
+      if (!currentOrderCode) return showError('Load a valid Reseller Order first.');
+
+      const count = Number(document.getElementById('mintCountInput').value || 0);
+      const note = (document.getElementById('mintNoteInput').value || '').trim();
+      if (!Number.isInteger(count) || count < 1 || count > 50) {
+        return showError('Enter a quantity between 1 and 50.');
+      }
+
+      const btn = document.getElementById('mintBtn');
+      btn.disabled = true;
+      btn.textContent = 'Minting Scratch PINs...';
+      try {
+        const resp = await fetch(`${getApiBaseUrl()}/api/reseller`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'mint_vouchers',
+            orderCode: currentOrderCode,
+            count,
+            note,
+          }),
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.ok) {
+          return showError(data.message || 'Unable to mint Scratch PINs.');
+        }
+
+        lastMintedVouchers = Array.isArray(data.vouchers) ? data.vouchers : [];
+        document.getElementById('mintResultMeta').textContent =
+          `Minted ${data.mintedCount} single-use Scratch PIN(s) · ${data.remainingCredits} credits remaining.`;
+
+        const grid = document.getElementById('mintedVoucherGrid');
+        grid.innerHTML = lastMintedVouchers.map((v, idx) => `
+          <div class="voucher-slip">
+            <div style="font-size:10.5px;color:var(--muted);font-weight:700;">PASSFORGE UTME · SLIP #${idx + 1}</div>
+            <div class="code">${escapeHtml(v.voucherCode)}</div>
+            <div style="font-size:11px;color:var(--muted);">Paste in App → Activation Hub (1 Device)</div>
+            <button class="btn-secondary btn-sm no-print" style="margin-top:8px;" onclick='copyText(${JSON.stringify(v.voucherCode)}, "Scratch PIN copied!")'>Copy</button>
+          </div>
+        `).join('');
+        document.getElementById('mintResultBox').style.display = 'block';
+        await loadOrderSummary(currentOrderCode, false);
+      } catch (_) {
+        showError('Network error minting Scratch PINs.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Mint Scratch PINs';
+      }
+    }
+
+    function copyAllMintedVouchers() {
+      if (!lastMintedVouchers.length) return;
+      const text = lastMintedVouchers.map((v, i) => `${i + 1}. ${v.voucherCode}`).join('\n');
+      copyText(text, `Copied ${lastMintedVouchers.length} Scratch PINs!`);
+    }
+
+    function triggerCsvDownload(filename, rows) {
+      const csv = rows.map((r) => r.map((c) => `"${String(c == null ? '' : c).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadVouchersCsv() {
+      if (!lastMintedVouchers.length) return;
+      const rows = [['Voucher PIN', 'Note', 'Status', 'Created At']];
+      lastMintedVouchers.forEach((v) => {
+        rows.push([v.voucherCode, v.note || '', v.status, v.createdAt]);
+      });
+      triggerCsvDownload(`passforge-vouchers-${currentOrderCode || 'batch'}.csv`, rows);
+    }
+
+    function downloadFullLedgerCsv() {
+      if (!currentHistory.length) return showError('No ledger entries to export yet.');
+      const rows = [['Type', 'Code or PIN', 'Target Product Key', 'Note', 'Status', 'Created At', 'Redeemed Product Key']];
+      currentHistory.forEach((h) => {
+        rows.push([
+          h.type,
+          h.type === 'scratch' ? h.voucherCode : h.activationPin,
+          h.productKey || '',
+          h.note || '',
+          h.status || '',
+          h.createdAt || '',
+          h.redeemedProductKey || '',
+        ]);
+      });
+      triggerCsvDownload(`passforge-reseller-ledger-${currentOrderCode || 'order'}.csv`, rows);
+    }
+
+    (function initPortal() {
+      const params = new URLSearchParams(window.location.search);
+      const codeParam = params.get('code') || params.get('reference') || '';
+      const initialCode = (codeParam || localStorage.getItem('passforge_reseller_order') || '').trim();
+      if (initialCode) {
+        document.getElementById('orderCodeInput').value = initialCode;
+        loadOrderSummary(initialCode, false);
+      }
+    })();
+  </script>
+</body>
+
+</html>
+

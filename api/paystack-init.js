@@ -41,6 +41,7 @@ module.exports = async function handler(req, res) {
     mode: body.mode,
     productKey: body.productKey,
     referralCode: body.referralCode,
+    units: body.units,
   });
 
   if (!order.ok) {
@@ -66,7 +67,7 @@ module.exports = async function handler(req, res) {
           {
             display_name: 'Order Type',
             variable_name: 'order_type',
-            value: order.mode === 'reseller' ? 'Reseller 10-PIN Pack' : 'Single Student License',
+            value: order.mode === 'reseller' ? `Reseller ${order.units}-PIN Pack` : 'Single Student License',
           },
           ...(order.productKey
             ? [{ display_name: 'App Product Key', variable_name: 'product_key', value: order.productKey }]
@@ -95,6 +96,7 @@ module.exports = async function handler(req, res) {
       accessCode: result.data.access_code,
       reference: result.data.reference,
       amountNaira: order.amountNaira,
+      units: order.units,
       mode: order.mode,
       productKey: order.productKey,
       referralCode: order.referralCode,
