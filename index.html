@@ -1396,10 +1396,12 @@
       <button class="close-btn" onclick="closeCheckout()">✕</button>
       <div class="mock-label" id="checkoutTag">INSTANT PAYSTACK CHECKOUT · CARD / TRANSFER / USSD</div>
       <h3 id="checkoutTitle" style="font-size:20px;margin-bottom:6px;">Buy Student Activation PIN</h3>
-      <p id="checkoutSubtitle" style="font-size:13px;color:var(--muted);margin-bottom:12px;">Enter your email/WhatsApp and your app's Product
-        Key to unlock your device-locked Activation PIN immediately after payment.</p>
-      <label id="buyerInputLabel" style="font-size:12px;color:var(--muted);">Student Email or WhatsApp Number</label>
-      <input class="input" id="buyerInput" placeholder="e.g. student@gmail.com or 0803..." />
+      <p id="checkoutSubtitle" style="font-size:13px;color:var(--muted);margin-bottom:12px;">Enter your email address and your app's Product
+        Key to receive your device-locked Activation PIN immediately and by email.</p>
+      <label id="buyerInputLabel" style="font-size:12px;color:var(--muted);">Student Email Address (Required for Auto-Email Backup)</label>
+      <input class="input" id="buyerInput" type="email" autocomplete="email" placeholder="e.g. student@gmail.com" />
+      <label id="buyerPhoneLabel" style="font-size:12px;color:var(--muted);">WhatsApp / Phone Number (Optional — for 1-Tap Self-Backup)</label>
+      <input class="input" id="buyerPhoneInput" type="tel" autocomplete="tel" placeholder="e.g. 0803 123 4567 (optional)" />
       <div id="resellerPackFields" style="display:none;margin-bottom:10px;">
         <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Select Reseller Pack Size</label>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
@@ -1435,10 +1437,30 @@
           ACTIVATION PIN READY</div>
         <div id="pinCode" style="font-family:var(--mono);font-size:18px;font-weight:700;margin-top:4px;"></div>
         <div id="pinMeta" style="font-size:12px;color:var(--muted);margin-top:6px;"></div>
+        <div id="emailDeliveryStatus" style="display:none;font-size:12px;margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#a7f3d0;"></div>
+        <div id="chromeSavePrompt" style="display:none;margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35);font-size:12px;color:#dbeafe;">
+          <div id="chromeSaveText" style="margin-bottom:8px;">Save your Activation PIN to <strong>Chrome Password Manager</strong> so Chrome remembers it?</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-primary" id="saveChromeBtn" type="button" style="padding:7px 12px;font-size:12px;" onclick="promptSavePinToChrome()">Yes, Save in Chrome</button>
+            <button class="btn-secondary" type="button" style="padding:7px 12px;font-size:12px;" onclick="document.getElementById('chromeSavePrompt').style.display='none'">Not Now</button>
+          </div>
+        </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
           <button class="btn-secondary" id="copyPinBtn" type="button"
             style="padding:8px 14px;font-size:12px;display:none;" onclick="copyVerifiedPin()">
             Copy Activation PIN
+          </button>
+          <a class="btn-secondary" id="sendWhatsappBtn" target="_blank" rel="noopener"
+            style="padding:8px 14px;font-size:12px;display:none;" href="#">
+            Send to My WhatsApp
+          </a>
+          <a class="btn-secondary" id="sendSmsBtn"
+            style="padding:8px 14px;font-size:12px;display:none;" href="#">
+            Send via Phone SMS
+          </a>
+          <button class="btn-secondary" id="downloadBackupBtn" type="button"
+            style="padding:8px 14px;font-size:12px;display:none;" onclick="downloadVerifiedBackup()">
+            Download Backup (.txt)
           </button>
           <a class="btn-primary" id="openResellerPortalLink" href="reseller.html"
             style="padding:8px 14px;font-size:12px;display:none;">
@@ -1616,16 +1638,16 @@
       const subtitle = document.getElementById('checkoutSubtitle');
       const buyerLabel = document.getElementById('buyerInputLabel');
       if (mode === 'reseller') {
-        if (subtitle) subtitle.textContent = 'Select a bulk pack size (10, 25, or 50 PINs). After payment you receive a Reseller Order Code for our Portal (Direct Offline PINs + Copy & Sell Scratch PINs).';
-        if (buyerLabel) buyerLabel.textContent = 'Reseller Email or WhatsApp Number';
+        if (subtitle) subtitle.textContent = 'Select a bulk pack size (10, 25, or 50 PINs). After payment you receive a Reseller Order Code on screen and by email for Direct Offline PINs and Scratch PINs.';
+        if (buyerLabel) buyerLabel.textContent = 'Reseller Email Address (Required for Order Code & Scratch PINs)';
         if (resellerFields) resellerFields.style.display = 'block';
         if (singleFields) singleFields.style.display = 'none';
         if (discountBadge) discountBadge.style.display = 'none';
         selectResellerUnits(currentResellerUnits);
       } else {
         document.getElementById('checkoutTitle').textContent = 'Buy Student Activation PIN';
-        if (subtitle) subtitle.textContent = "Enter your email/WhatsApp and your app's Product Key to unlock your device-locked Activation PIN immediately after payment.";
-        if (buyerLabel) buyerLabel.textContent = 'Student Email or WhatsApp Number';
+        if (subtitle) subtitle.textContent = "Enter your email address and your app's Product Key to receive your device-locked Activation PIN immediately and by email.";
+        if (buyerLabel) buyerLabel.textContent = 'Student Email Address (Required for Auto-Email Backup)';
         if (resellerFields) resellerFields.style.display = 'none';
         if (singleFields) singleFields.style.display = 'block';
         updateReferralDiscount();
@@ -1660,12 +1682,17 @@
       document.getElementById('pinResult').style.display = 'none';
 
       const buyerContact = (document.getElementById('buyerInput').value || '').trim();
+      const buyerPhone = (document.getElementById('buyerPhoneInput') ? document.getElementById('buyerPhoneInput').value : '').trim();
       const productKeyRaw = (document.getElementById('deviceKeyInput').value || '').trim().toUpperCase();
       const referralCode = (document.getElementById('referralInput').value || '').trim().toUpperCase();
 
-      if (!buyerContact) {
-        return showCheckoutError('Please enter your email address or WhatsApp phone number.');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(buyerContact)) {
+        return showCheckoutError('Please enter a valid email address (e.g. student@gmail.com) so we can send your Activation PIN automatically.');
       }
+      try {
+        sessionStorage.setItem('passforge_last_email', buyerContact);
+        if (buyerPhone) sessionStorage.setItem('passforge_last_phone', buyerPhone);
+      } catch (_) {}
       if (currentCheckoutMode === 'single') {
         const cleanedKey = productKeyRaw.replace(/[^A-Z0-9]/g, '');
         if (!/^[A-Z0-9]{9}$/.test(cleanedKey)) {
@@ -1727,13 +1754,24 @@
       const pinCodeEl = document.getElementById('pinCode');
       const pinMetaEl = document.getElementById('pinMeta');
       const copyBtn = document.getElementById('copyPinBtn');
+      const waBtn = document.getElementById('sendWhatsappBtn');
+      const smsBtn = document.getElementById('sendSmsBtn');
+      const dlBtn = document.getElementById('downloadBackupBtn');
+      const emailBox = document.getElementById('emailDeliveryStatus');
+      const chromeBox = document.getElementById('chromeSavePrompt');
 
       resultBox.style.display = 'block';
       statusLabel.textContent = 'VERIFYING PAYSTACK PAYMENT...';
       pinCodeEl.textContent = 'Please wait...';
       pinMetaEl.textContent = `Reference: ${ref}`;
       copyBtn.style.display = 'none';
+      if (waBtn) waBtn.style.display = 'none';
+      if (smsBtn) smsBtn.style.display = 'none';
+      if (dlBtn) dlBtn.style.display = 'none';
+      if (emailBox) emailBox.style.display = 'none';
+      if (chromeBox) chromeBox.style.display = 'none';
       lastVerifiedPin = '';
+      window.__pfVerifiedBackup = null;
 
       try {
         const resp = await fetch(`${getApiBaseUrl()}/api/paystack-verify?reference=${encodeURIComponent(ref)}`);
@@ -1742,6 +1780,16 @@
           resultBox.style.display = 'none';
           return showCheckoutError(data.message || 'Payment verification failed or not completed yet.');
         }
+
+        let storedEmail = '';
+        let storedPhone = '';
+        try {
+          storedEmail = sessionStorage.getItem('passforge_last_email') || '';
+          storedPhone = sessionStorage.getItem('passforge_last_phone') || '';
+        } catch (_) {}
+        const buyerEmail = (data.buyerContact && data.buyerContact.includes('@') && !/^wa\.\d+@passforge\.ng$/i.test(data.buyerContact))
+          ? data.buyerContact
+          : storedEmail;
 
         if (data.mode === 'reseller') {
           statusLabel.textContent = `RESELLER ORDER VERIFIED · ${data.units || 10}-PIN PACK`;
@@ -1755,6 +1803,17 @@
             portalLink.href = data.portalUrl || `reseller.html?code=${encodeURIComponent(data.resellerOrderCode)}`;
             portalLink.style.display = 'inline-flex';
           }
+          window.__pfVerifiedBackup = {
+            mode: 'reseller',
+            code: data.resellerOrderCode,
+            formattedCode: data.resellerOrderCode,
+            units: data.units || 10,
+            reference: data.reference,
+            amountNaira: data.amountNaira,
+            email: buyerEmail,
+            phone: storedPhone,
+            portalUrl: `https://passforge-utme.vercel.app/reseller.html?code=${encodeURIComponent(data.resellerOrderCode)}`,
+          };
         } else {
           const portalLink = document.getElementById('openResellerPortalLink');
           if (portalLink) portalLink.style.display = 'none';
@@ -1764,11 +1823,141 @@
           pinMetaEl.textContent = `Locked to Product Key ${data.productKey} · Ref ${data.reference}. Paste inside App → Activation Hub.`;
           copyBtn.textContent = 'Copy Activation PIN';
           copyBtn.style.display = 'inline-flex';
+          window.__pfVerifiedBackup = {
+            mode: 'single',
+            code: data.activationPin,
+            formattedCode: data.formattedPin || data.activationPin,
+            productKey: data.productKey,
+            reference: data.reference,
+            amountNaira: data.amountNaira,
+            email: buyerEmail,
+            phone: storedPhone,
+          };
+        }
+
+        if (emailBox) {
+          const ed = data.emailDelivery || {};
+          if (ed.sent || ed.alreadySent) {
+            emailBox.style.background = 'rgba(16,185,129,0.1)';
+            emailBox.style.borderColor = 'rgba(16,185,129,0.3)';
+            emailBox.style.color = '#a7f3d0';
+            emailBox.textContent = ed.alreadySent
+              ? `✓ Backup email already delivered to ${ed.to || buyerEmail}`
+              : `✓ Backup automatically emailed to ${ed.to || buyerEmail}`;
+            emailBox.style.display = 'block';
+          } else if (buyerEmail) {
+            emailBox.style.background = 'rgba(245,158,11,0.12)';
+            emailBox.style.borderColor = 'rgba(245,158,11,0.35)';
+            emailBox.style.color = '#fcd34d';
+            emailBox.textContent = `Note: Automatic email pending (${ed.reason === 'MAILER_NOT_CONFIGURED' ? 'SMTP setup in progress' : (ed.error || ed.reason || 'unavailable')}). Please save your PIN below.`;
+            emailBox.style.display = 'block';
+          }
+        }
+
+        const backupText = buildBackupMessage(window.__pfVerifiedBackup);
+        if (waBtn) {
+          let waDigits = String(storedPhone || '').replace(/\D/g, '');
+          if (waDigits.length === 11 && waDigits.startsWith('0')) waDigits = `234${waDigits.slice(1)}`;
+          waBtn.href = waDigits.length >= 10
+            ? `https://wa.me/${waDigits}?text=${encodeURIComponent(backupText)}`
+            : `https://wa.me/?text=${encodeURIComponent(backupText)}`;
+          waBtn.style.display = 'inline-flex';
+        }
+        if (smsBtn) {
+          const smsNum = String(storedPhone || '').replace(/[^+\d]/g, '');
+          smsBtn.href = `sms:${smsNum}?body=${encodeURIComponent(backupText)}`;
+          smsBtn.style.display = 'inline-flex';
+        }
+        if (dlBtn) {
+          dlBtn.style.display = 'inline-flex';
+        }
+        if (chromeBox && 'PasswordCredential' in window && navigator.credentials) {
+          const saveLabel = document.getElementById('chromeSaveText');
+          const saveBtn = document.getElementById('saveChromeBtn');
+          if (saveLabel) {
+            saveLabel.innerHTML = data.mode === 'reseller'
+              ? 'Save your <strong>Reseller Order Code</strong> in <strong>Chrome Password Manager</strong> so Chrome remembers it?'
+              : 'Save your <strong>Activation PIN</strong> in <strong>Chrome Password Manager</strong> so Chrome remembers it?';
+          }
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Yes, Save in Chrome';
+          }
+          chromeBox.style.display = 'block';
         }
       } catch (_) {
         resultBox.style.display = 'none';
         showCheckoutError('Network error verifying Paystack reference. Retry in a moment.');
       }
+    }
+
+    function buildBackupMessage(b) {
+      if (!b) return '';
+      if (b.mode === 'reseller') {
+        return [
+          'PassForge UTME 2027 - Reseller Backup',
+          `Order Code: ${b.code}`,
+          `Credits: ${b.units} PINs`,
+          `Paystack Ref: ${b.reference}`,
+          `Portal: ${b.portalUrl}`,
+        ].join('\n');
+      }
+      return [
+        'PassForge UTME 2027 - Activation Backup',
+        `Product Key: ${b.productKey}`,
+        `Activation PIN: ${b.formattedCode}`,
+        `Paystack Ref: ${b.reference}`,
+        'Open PassForge -> Activation Hub -> Paste PIN -> Verify PIN (works 100% offline).',
+      ].join('\n');
+    }
+
+    async function promptSavePinToChrome() {
+      const b = window.__pfVerifiedBackup;
+      if (!b || !('PasswordCredential' in window) || !navigator.credentials) return;
+      const btn = document.getElementById('saveChromeBtn');
+      const label = document.getElementById('chromeSaveText');
+      try {
+        const credId = b.mode === 'reseller'
+          ? (b.email ? `${b.email} (${b.code})` : b.code)
+          : (b.productKey ? `${b.productKey}${b.email ? ` · ${b.email}` : ''}` : (b.email || 'PassForge'));
+        const credName = b.mode === 'reseller'
+          ? `PassForge Reseller (${b.units} PINs)`
+          : `PassForge Key ${b.productKey || ''}`.trim();
+        const cred = new window.PasswordCredential({
+          id: credId,
+          name: credName,
+          password: b.code,
+        });
+        await navigator.credentials.store(cred);
+        if (btn) {
+          btn.textContent = 'Saved in Chrome ✓';
+          btn.disabled = true;
+        }
+        if (label) {
+          label.textContent = 'Chrome Password Manager prompt triggered! Accept "Save" at the top of Chrome to store it.';
+        }
+      } catch (err) {
+        if (label) {
+          label.textContent = 'Chrome could not open the password prompt here — use Email or Download Backup (.txt) below.';
+        }
+      }
+    }
+
+    function downloadVerifiedBackup() {
+      const b = window.__pfVerifiedBackup;
+      if (!b) return;
+      const content = buildBackupMessage(b) + `\nEmail: ${b.email || 'N/A'}\nDate: ${new Date().toISOString()}\n`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = b.mode === 'reseller'
+        ? `passforge-reseller-${b.code}.txt`
+        : `passforge-pin-${b.productKey || 'backup'}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     function copyVerifiedPin() {

@@ -10,6 +10,7 @@ const {
 } = require('../lib/passforge');
 const { recordConfirmedSinglePurchase } = require('../lib/fulfillment');
 const { recordConfirmedResellerPurchase } = require('../lib/reseller');
+const { createMailer, normalizeDeliverableEmail } = require('../lib/mailer');
 
 async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -109,6 +110,38 @@ async function handler(req, res) {
         referralReward: expected.referralReward,
       });
     } catch (_) {}
+  }
+
+  // Automatic Gmail SMTP backup email (idempotent with paystack-verify via Redis reference lock).
+  try {
+    const recipientEmail =
+      normalizeDeliverableEmail(fulfillment.buyerContact) ||
+      normalizeDeliverableEmail(tx.customer && tx.customer.email) ||
+      '';
+    if (recipientEmail) {
+      const mailer = createMailer();
+      if (fulfillment.mode === 'reseller' && fulfillment.resellerOrderCode) {
+        await mailer.sendResellerOrderEmail({
+          to: recipientEmail,
+          orderCode: fulfillment.resellerOrderCode,
+          units: fulfillment.units,
+          amountNaira: fulfillment.amountNaira,
+          reference: fulfillment.reference,
+        });
+      } else if (fulfillment.activationPin) {
+        await mailer.sendSingleActivationEmail({
+          to: recipientEmail,
+          productKey: fulfillment.productKey,
+          activationPin: fulfillment.activationPin,
+          formattedPin: fulfillment.formattedPin,
+          reference: fulfillment.reference,
+          amountNaira: fulfillment.amountNaira,
+          paidAt: fulfillment.paidAt,
+        });
+      }
+    }
+  } catch (mailErr) {
+    console.warn('[paystack-webhook] email dispatch warning:', mailErr.message);
   }
 
   // Log operational audit summary without exposing secret salt or full PIN in Vercel logs.

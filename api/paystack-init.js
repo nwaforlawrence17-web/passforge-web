@@ -28,12 +28,16 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 400, { error: 'INVALID_JSON', message: 'Invalid JSON request body.' });
   }
 
-  const buyerContact = typeof body.buyerContact === 'string' ? body.buyerContact.trim() : '';
-  const paystackEmail = toPaystackEmail(buyerContact);
+  const { normalizeDeliverableEmail } = require('../lib/mailer');
+  const rawEmail = typeof body.email === 'string' && body.email.trim()
+    ? body.email.trim()
+    : (typeof body.buyerContact === 'string' ? body.buyerContact.trim() : '');
+  const buyerContact = normalizeDeliverableEmail(rawEmail);
+  const paystackEmail = buyerContact;
   if (!paystackEmail) {
     return sendJson(res, 400, {
-      error: 'INVALID_CONTACT',
-      message: 'Enter a valid email address or Nigerian WhatsApp/phone number.',
+      error: 'INVALID_EMAIL',
+      message: 'Enter a valid email address so we can automatically send your Activation PIN or Reseller Code.',
     });
   }
 

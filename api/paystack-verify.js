@@ -10,6 +10,7 @@ const {
 } = require('../lib/passforge');
 const { recordConfirmedSinglePurchase } = require('../lib/fulfillment');
 const { recordConfirmedResellerPurchase } = require('../lib/reseller');
+const { createMailer, normalizeDeliverableEmail } = require('../lib/mailer');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
@@ -113,6 +114,26 @@ module.exports = async function handler(req, res) {
       } catch (recErr) {
         console.warn('[paystack-verify] reseller Redis record failed:', recErr.message);
       }
+      let emailDelivery = { sent: false, skipped: true, reason: 'NO_DELIVERABLE_EMAIL' };
+      try {
+        const recipientEmail =
+          normalizeDeliverableEmail(meta.buyerContact) ||
+          normalizeDeliverableEmail(tx.customer && tx.customer.email) ||
+          '';
+        if (recipientEmail) {
+          const mailer = createMailer();
+          emailDelivery = await mailer.sendResellerOrderEmail({
+            to: recipientEmail,
+            orderCode,
+            units: expected.units,
+            amountNaira,
+            reference: tx.reference,
+            portalUrl: `https://passforge-utme.vercel.app/reseller.html?code=${encodeURIComponent(orderCode)}`,
+          });
+        }
+      } catch (mailErr) {
+        console.warn('[paystack-verify] reseller email dispatch warning:', mailErr.message);
+      }
       return sendJson(res, 200, {
         verified: true,
         mode: 'reseller',
@@ -123,6 +144,7 @@ module.exports = async function handler(req, res) {
         creditsRecorded,
         portalUrl: `/reseller.html?code=${encodeURIComponent(orderCode)}`,
         buyerContact,
+        emailDelivery,
         paidAt,
       });
     }
@@ -138,6 +160,15 @@ module.exports = async function handler(req, res) {
 
     const activationPin = generateActivationPin(expected.productKey, secretSalt);
 
+    const recipientEmail =
+      normalizeDeliverableEmail(meta.buyerContact) ||
+      normalizeDeliverableEmail(tx.customer && tx.customer.email) ||
+      '';
+    const buyerContact = recipientEmail || meta.buyerContact || (tx.customer && tx.customer.email) || '';
+    const paidAt = tx.paid_at || tx.transaction_date || null;
+    const amountNaira = Number(tx.amount) / 100;
+    const formattedPin = formatDisplayPin(activationPin);
+
     // Best-effort install/activation stat recording + license & referral crediting;
     // never fail payment fulfillment if Redis errs.
     try {
@@ -145,23 +176,42 @@ module.exports = async function handler(req, res) {
         productKey: expected.productKey,
         activationPin,
         reference: tx.reference,
-        paidAt: tx.paid_at || tx.transaction_date || null,
+        paidAt,
         referralCode: expected.referralCode,
         referralReward: expected.referralReward,
       });
     } catch (_) { }
 
+    let emailDelivery = { sent: false, skipped: true, reason: 'NO_DELIVERABLE_EMAIL' };
+    try {
+      if (recipientEmail) {
+        const mailer = createMailer();
+        emailDelivery = await mailer.sendSingleActivationEmail({
+          to: recipientEmail,
+          productKey: expected.productKey,
+          activationPin,
+          formattedPin,
+          reference: tx.reference,
+          amountNaira,
+          paidAt,
+        });
+      }
+    } catch (mailErr) {
+      console.warn('[paystack-verify] student email dispatch warning:', mailErr.message);
+    }
+
     return sendJson(res, 200, {
       verified: true,
       mode: 'single',
       reference: tx.reference,
-      amountNaira: Number(tx.amount) / 100,
+      amountNaira,
       productKey: expected.productKey,
       referralCode: expected.referralCode,
       activationPin,
-      formattedPin: formatDisplayPin(activationPin),
-      buyerContact: meta.buyerContact || (tx.customer && tx.customer.email) || '',
-      paidAt: tx.paid_at || tx.transaction_date || null,
+      formattedPin,
+      buyerContact,
+      emailDelivery,
+      paidAt,
     });
   } catch (err) {
     return sendJson(res, 502, {

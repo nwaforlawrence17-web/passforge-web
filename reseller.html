@@ -650,6 +650,10 @@
               <label class="field-label">Batch Label / Shop Note (Optional)</label>
               <input class="input" id="mintNoteInput" placeholder="e.g. Tutorial Center Batch 1" maxlength="80" />
             </div>
+            <div>
+              <label class="field-label">Auto-Email Scratch PINs To (Optional)</label>
+              <input class="input" id="mintEmailInput" type="email" placeholder="e.g. reseller@gmail.com" />
+            </div>
           </div>
           <button class="btn-primary" id="mintBtn" onclick="mintScratchVouchers()">Mint Scratch PINs</button>
         </div>
@@ -659,12 +663,17 @@
             <div>
               <div style="font-size:11px;font-weight:700;color:var(--emerald);text-transform:uppercase;">MINTED SCRATCH VOUCHERS READY</div>
               <div class="muted" id="mintResultMeta" style="font-size:12.5px;"></div>
+              <div id="mintEmailStatus" style="display:none;font-size:12px;color:#a7f3d0;margin-top:4px;"></div>
             </div>
             <div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="btn-secondary btn-sm" onclick="copyAllMintedVouchers()">Copy All PINs</button>
               <button class="btn-secondary btn-sm" onclick="downloadVouchersCsv()">Download CSV</button>
               <button class="btn-primary btn-sm" onclick="window.print()">Print Slips</button>
             </div>
+          </div>
+          <div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+            <input class="input" id="sendBatchEmailInput" type="email" style="flex:1;min-width:220px;margin:0;" placeholder="Email this batch to (e.g. reseller@gmail.com)" />
+            <button class="btn-secondary btn-sm" id="sendBatchEmailBtn" type="button" onclick="emailScratchBatch()">Email Scratch PINs</button>
           </div>
           <div class="voucher-grid" id="mintedVoucherGrid"></div>
         </div>
@@ -789,6 +798,15 @@
 
       localStorage.setItem('passforge_reseller_order', currentOrderCode);
       document.getElementById('orderCodeInput').value = currentOrderCode;
+
+      const orderEmail = (data.order && data.order.buyerContact) ? String(data.order.buyerContact).trim() : '';
+      const isRealEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(orderEmail) && !/^wa\.\d+@passforge\.ng$/i.test(orderEmail);
+      const mintEmailInput = document.getElementById('mintEmailInput');
+      const sendBatchInput = document.getElementById('sendBatchEmailInput');
+      if (isRealEmail) {
+        if (mintEmailInput && !mintEmailInput.value) mintEmailInput.value = orderEmail;
+        if (sendBatchInput && !sendBatchInput.value) sendBatchInput.value = orderEmail;
+      }
 
       document.getElementById('loadedOrderCode').textContent = currentOrderCode;
       document.getElementById('statRemaining').textContent = String(data.remainingCredits);
@@ -940,6 +958,7 @@
 
       const count = Number(document.getElementById('mintCountInput').value || 0);
       const note = (document.getElementById('mintNoteInput').value || '').trim();
+      const email = (document.getElementById('mintEmailInput') ? document.getElementById('mintEmailInput').value : '').trim();
       if (!Number.isInteger(count) || count < 1 || count > 50) {
         return showError('Enter a quantity between 1 and 50.');
       }
@@ -956,6 +975,7 @@
             orderCode: currentOrderCode,
             count,
             note,
+            email,
           }),
         });
         const data = await resp.json().catch(() => ({}));
@@ -966,6 +986,24 @@
         lastMintedVouchers = Array.isArray(data.vouchers) ? data.vouchers : [];
         document.getElementById('mintResultMeta').textContent =
           `Minted ${data.mintedCount} single-use Scratch PIN(s) · ${data.remainingCredits} credits remaining.`;
+
+        const mailEl = document.getElementById('mintEmailStatus');
+        if (mailEl) {
+          if (data.emailDelivery && data.emailDelivery.sent) {
+            mailEl.textContent = `✓ Scratch PIN batch emailed automatically to ${data.emailDelivery.to}`;
+            mailEl.style.color = '#a7f3d0';
+            mailEl.style.display = 'block';
+          } else if (email && data.emailDelivery && !data.emailDelivery.sent) {
+            mailEl.textContent = `Note: Auto-email not sent (${data.emailDelivery.reason || 'check email address'}). Use "Email Scratch PINs" or Download CSV below.`;
+            mailEl.style.color = '#fcd34d';
+            mailEl.style.display = 'block';
+          } else {
+            mailEl.style.display = 'none';
+          }
+        }
+        if (email && document.getElementById('sendBatchEmailInput')) {
+          document.getElementById('sendBatchEmailInput').value = email;
+        }
 
         const grid = document.getElementById('mintedVoucherGrid');
         grid.innerHTML = lastMintedVouchers.map((v, idx) => `
@@ -990,6 +1028,48 @@
       if (!lastMintedVouchers.length) return;
       const text = lastMintedVouchers.map((v, i) => `${i + 1}. ${v.voucherCode}`).join('\n');
       copyText(text, `Copied ${lastMintedVouchers.length} Scratch PINs!`);
+    }
+
+    async function emailScratchBatch() {
+      showError('');
+      if (!currentOrderCode) return showError('Load a valid Reseller Order first.');
+      const email = (document.getElementById('sendBatchEmailInput').value || '').trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+        return showError('Enter a valid email address to send the Scratch PINs to.');
+      }
+
+      const btn = document.getElementById('sendBatchEmailBtn');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      try {
+        const resp = await fetch(`${getApiBaseUrl()}/api/reseller`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'email_vouchers',
+            orderCode: currentOrderCode,
+            email,
+            voucherCodes: lastMintedVouchers.map((v) => v.voucherCode),
+            note: (document.getElementById('mintNoteInput').value || '').trim(),
+          }),
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.ok) {
+          return showError(data.message || 'Unable to email Scratch PINs.');
+        }
+        const mailEl = document.getElementById('mintEmailStatus');
+        if (mailEl) {
+          mailEl.textContent = `✓ Sent ${data.count} Scratch PIN(s) to ${data.emailDelivery.to}`;
+          mailEl.style.color = '#a7f3d0';
+          mailEl.style.display = 'block';
+        }
+        showToast(`Emailed ${data.count} Scratch PINs to ${data.emailDelivery.to}!`);
+      } catch (_) {
+        showError('Network error sending Scratch PIN email.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Email Scratch PINs';
+      }
     }
 
     function triggerCsvDownload(filename, rows) {
