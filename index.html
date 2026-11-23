@@ -1358,6 +1358,19 @@
           <p>So you can verify the speed, question accuracy, math rendering, and Jarvis voice tutor yourself before
             spending a kobo.</p>
         </div>
+        <div class="card">
+          <h3>Need help or bulk reseller support?</h3>
+          <p style="margin-bottom:12px;">All single-user and reseller support is handled directly on WhatsApp (<strong
+              style="color:#fff;">+234 916 484 4687</strong>).</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a class="btn-secondary" style="padding:8px 12px;font-size:12.5px;" target="_blank" rel="noopener"
+              href="https://wa.me/2349164844687?text=Hello%20PassForge%20Support%2C%20I%20am%20a%20student%20and%20need%20help%20with%20PassForge%20UTME.">Student
+              WhatsApp</a>
+            <a class="btn-secondary" style="padding:8px 12px;font-size:12.5px;" target="_blank" rel="noopener"
+              href="https://wa.me/2349164844687?text=Hello%20PassForge%20Support%2C%20I%20am%20a%20reseller%20and%20need%20help%20with%20bulk%20PIN%20orders.">Reseller
+              WhatsApp</a>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -1366,7 +1379,8 @@
     <div class="container footer-flex">
       <div>© 2026–2027 PassForge · Offline CBT Suite (UTME · WAEC/NECO · JUPEB · IJMB · BECE · ICAN · Bar)</div>
       <div class="footer-links">
-        <a href="#faq">Support &amp; WhatsApp</a>
+        <a href="https://wa.me/2349164844687?text=Hello%20PassForge%20Support%2C%20I%20need%20help%20with%20PassForge%20UTME."
+          target="_blank" rel="noopener">Support &amp; WhatsApp</a>
         <a href="reseller.html">Reseller Portal</a>
         <a href="#install">Install Guide</a>
       </div>
@@ -1477,6 +1491,12 @@
             onclick="verifyPaystackReference(document.getElementById('manualRefInput').value)">Verify</button>
         </div>
       </details>
+      <div style="margin-top:12px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+        <span>Need help with payment or your PIN?</span>
+        <a id="checkoutWhatsappSupport" target="_blank" rel="noopener"
+          style="color:var(--emerald);font-weight:700;text-decoration:none;"
+          href="https://wa.me/2349164844687?text=Hello%20PassForge%20Support%2C%20I%20need%20help%20with%20PassForge%20checkout.">Chat on WhatsApp →</a>
+      </div>
     </div>
   </div>
 
@@ -1637,12 +1657,17 @@
       const discountBadge = document.getElementById('discountBadge');
       const subtitle = document.getElementById('checkoutSubtitle');
       const buyerLabel = document.getElementById('buyerInputLabel');
+      const waSupport = document.getElementById('checkoutWhatsappSupport');
       if (mode === 'reseller') {
         if (subtitle) subtitle.textContent = 'Select a bulk pack size (10, 25, or 50 PINs). After payment you receive a Reseller Order Code on screen and by email for Direct Offline PINs and Scratch PINs.';
         if (buyerLabel) buyerLabel.textContent = 'Reseller Email Address (Required for Order Code & Scratch PINs)';
         if (resellerFields) resellerFields.style.display = 'block';
         if (singleFields) singleFields.style.display = 'none';
         if (discountBadge) discountBadge.style.display = 'none';
+        if (waSupport) {
+          waSupport.href = 'https://wa.me/2349164844687?text=' + encodeURIComponent('Hello PassForge Support, I am a reseller and need help with a bulk PIN order.');
+          waSupport.textContent = 'Reseller WhatsApp Support →';
+        }
         selectResellerUnits(currentResellerUnits);
       } else {
         document.getElementById('checkoutTitle').textContent = 'Buy Student Activation PIN';
@@ -1650,6 +1675,10 @@
         if (buyerLabel) buyerLabel.textContent = 'Student Email Address (Required for Auto-Email Backup)';
         if (resellerFields) resellerFields.style.display = 'none';
         if (singleFields) singleFields.style.display = 'block';
+        if (waSupport) {
+          waSupport.href = 'https://wa.me/2349164844687?text=' + encodeURIComponent('Hello PassForge Support, I need help activating or buying a PassForge UTME PIN.');
+          waSupport.textContent = 'Student WhatsApp Support →';
+        }
         updateReferralDiscount();
       }
       document.getElementById('checkoutModal').classList.add('open');
