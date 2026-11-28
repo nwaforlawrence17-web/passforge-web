@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const {
+  loadPricingConfig,
   normalizeProductKey,
   normalizeReferralCode,
   normalizeResellerOrderCode,
@@ -9,7 +10,99 @@ const {
   utcDateKey,
 } = require('../lib/passforge');
 const { getOrderSummary } = require('../lib/reseller');
-const { getRedisConfig, redisCommand, redisPipeline } = require('../lib/redis');
+const { getRedisConfig, redisCommand: defaultRedisCommand, redisPipeline: defaultRedisPipeline } = require('../lib/redis');
+
+const DEFAULT_EMMA_USAGE_URL = 'https://emmacloudrouter.vercel.app/api/usage';
+const DEFAULT_USD_NGN_RATE = 1600;
+const FX_CACHE_KEY = 'cache:fx:usd_ngn';
+const FX_CACHE_TTL_SECONDS = 6 * 60 * 60;
+
+function watDateKey(nowMs = Date.now()) {
+  return new Date(nowMs + 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+function signUsageRequest(ts, secretSalt) {
+  return crypto
+    .createHmac('sha256', secretSalt)
+    .update(`PF_AI_USAGE_V1|${String(ts)}`, 'utf8')
+    .digest('hex');
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = 3000, fetchFn = fetch) {
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+  try {
+    return await fetchFn(url, {
+      ...options,
+      ...(controller ? { signal: controller.signal } : {}),
+    });
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+async function fetchOpenRouterUsage({ secretSalt, usageUrl, nowMs, fetchFn = fetch }) {
+  if (!secretSalt || !usageUrl) return null;
+  const ts = String(nowMs);
+  const sig = signUsageRequest(ts, secretSalt);
+  try {
+    const resp = await fetchWithTimeout(
+      usageUrl,
+      {
+        method: 'GET',
+        headers: {
+          'X-Usage-Ts': ts,
+          'X-Usage-Sig': sig,
+        },
+      },
+      3000,
+      fetchFn
+    );
+    const data = await resp.json().catch(() => null);
+    if (!resp.ok || !data || !data.ok) return null;
+    return {
+      usageUsd: Number(data.usageUsd || 0),
+      usageDailyUsd: Number(data.usageDailyUsd || 0),
+      usageWeeklyUsd: Number(data.usageWeeklyUsd || 0),
+      usageMonthlyUsd: Number(data.usageMonthlyUsd || 0),
+      limitUsd: data.limitUsd === null || data.limitUsd === undefined ? null : Number(data.limitUsd),
+      limitRemainingUsd:
+        data.limitRemainingUsd === null || data.limitRemainingUsd === undefined
+          ? null
+          : Number(data.limitRemainingUsd),
+      checkedAt: data.checkedAt || new Date(nowMs).toISOString(),
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
+async function fetchUsdNgnRate({ redisCommand, fetchFn = fetch }) {
+  try {
+    const cachedRaw = await redisCommand(['GET', FX_CACHE_KEY]);
+    const cached = Number(cachedRaw);
+    if (Number.isFinite(cached) && cached > 100) {
+      return { rate: cached, source: 'cached_live' };
+    }
+  } catch (_) { }
+
+  try {
+    const resp = await fetchWithTimeout(
+      'https://open.er-api.com/v6/latest/USD',
+      { method: 'GET' },
+      2500,
+      fetchFn
+    );
+    const payload = await resp.json().catch(() => null);
+    const liveRate = Number(payload?.rates?.NGN);
+    if (resp.ok && Number.isFinite(liveRate) && liveRate > 100) {
+      await redisCommand(['SET', FX_CACHE_KEY, String(liveRate), 'EX', FX_CACHE_TTL_SECONDS]).catch(() => {});
+      return { rate: liveRate, source: 'live' };
+    }
+  } catch (_) { }
+
+  return { rate: DEFAULT_USD_NGN_RATE, source: 'fallback' };
+}
 
 function timingSafeMatch(a, b) {
   if (!a || !b) return false;
@@ -36,43 +129,51 @@ function safeJsonParse(raw) {
   return raw && typeof raw === 'object' ? raw : null;
 }
 
-module.exports = async function handler(req, res) {
-  setAdminCors(res);
+function createStatsHandler({
+  redisCommand = defaultRedisCommand,
+  redisPipeline = defaultRedisPipeline,
+  hasRedisConfig = () => Boolean(getRedisConfig()),
+  fetchFn = fetch,
+  env = process.env,
+  nowFn = () => Date.now(),
+} = {}) {
+  return async function handler(req, res) {
+    setAdminCors(res);
 
-  if (req.method === 'OPTIONS') {
-    res.statusCode = 200;
-    return res.end();
-  }
+    if (req.method === 'OPTIONS') {
+      res.statusCode = 200;
+      return res.end();
+    }
 
-  if (req.method !== 'GET' && req.method !== 'POST') {
-    res.setHeader('Allow', 'GET, POST, OPTIONS');
-    return sendJson(res, 405, { error: 'METHOD_NOT_ALLOWED', message: 'Use GET or POST.' });
-  }
+    if (req.method !== 'GET' && req.method !== 'POST') {
+      res.setHeader('Allow', 'GET, POST, OPTIONS');
+      return sendJson(res, 405, { error: 'METHOD_NOT_ALLOWED', message: 'Use GET or POST.' });
+    }
 
-  const expectedKey =
-    (process.env.ADMIN_STATS_KEY || process.env.PAYSTACK_SECRET_KEY || '').trim();
-  if (!expectedKey) {
-    return sendJson(res, 503, { error: 'STATS_AUTH_NOT_CONFIGURED' });
-  }
+    const expectedKey =
+      (env.ADMIN_STATS_KEY || env.PAYSTACK_SECRET_KEY || '').trim();
+    if (!expectedKey) {
+      return sendJson(res, 503, { error: 'STATS_AUTH_NOT_CONFIGURED' });
+    }
 
-  let providedKey = String(req.headers['x-admin-key'] || '').trim();
-  let queryParams = null;
-  if (req.url) {
-    try {
-      queryParams = new URL(req.url, 'http://localhost').searchParams;
-    } catch (_) { }
-  }
-  if (!providedKey && queryParams) {
-    providedKey = String(queryParams.get('key') || '').trim();
-  }
+    let providedKey = String(req.headers['x-admin-key'] || '').trim();
+    let queryParams = null;
+    if (req.url) {
+      try {
+        queryParams = new URL(req.url, 'http://localhost').searchParams;
+      } catch (_) { }
+    }
+    if (!providedKey && queryParams) {
+      providedKey = String(queryParams.get('key') || '').trim();
+    }
 
-  if (!timingSafeMatch(providedKey, expectedKey)) {
-    return sendJson(res, 401, { error: 'UNAUTHORIZED', message: 'Invalid admin password.' });
-  }
+    if (!timingSafeMatch(providedKey, expectedKey)) {
+      return sendJson(res, 401, { error: 'UNAUTHORIZED', message: 'Invalid admin password.' });
+    }
 
-  if (!getRedisConfig()) {
-    return sendJson(res, 503, { error: 'REDIS_NOT_CONFIGURED' });
-  }
+    if (!hasRedisConfig()) {
+      return sendJson(res, 503, { error: 'REDIS_NOT_CONFIGURED' });
+    }
 
   // POST -> admin actions (mark referral withdrawal paid)
   if (req.method === 'POST') {
@@ -222,9 +323,10 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // GET -> full stats + pending & paid withdrawals
+  // GET -> full stats + pending & paid withdrawals + AI cost vs revenue economics
   const days = [];
-  const now = Date.now();
+  const now = nowFn();
+  const watToday = watDateKey(now);
   for (let i = 0; i < 7; i += 1) {
     days.push(utcDateKey(now - i * 24 * 60 * 60 * 1000));
   }
@@ -239,8 +341,19 @@ module.exports = async function handler(req, res) {
     ['LRANGE', 'wallet:withdrawals:paid', 0, 49],
     ['GET', 'stats:reseller:orders:total'],
     ['GET', 'stats:reseller:units:total'],
+    ['GET', 'stats:revenue:single:naira'],
+    ['GET', 'stats:activations:referred:total'],
+    ['GET', 'stats:revenue:reseller:naira'],
+    ['GET', 'stats:referrals:credited:naira'],
+    ['GET', 'stats:ai:turns:total'],
+    ['GET', 'stats:ai:images:total'],
+    ['GET', 'stats:ai:voice:total'],
+    ['GET', `stats:ai:turns:${watToday}`],
+    ['GET', `stats:ai:images:${watToday}`],
+    ['GET', `stats:ai:voice:${watToday}`],
   ];
 
+  const DAY_OFFSET = 19;
   for (const d of days) {
     commands.push(
       ['GET', `stats:devices:new:${d}`],
@@ -250,7 +363,14 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const results = await redisPipeline(commands);
+    const secretSalt = (env.PIN_SECRET_SALT || '').trim();
+    const usageUrl = (env.EMMA_USAGE_URL || DEFAULT_EMMA_USAGE_URL).trim();
+    const [results, aiUsage, fxInfo] = await Promise.all([
+      redisPipeline(commands),
+      fetchOpenRouterUsage({ secretSalt, usageUrl, nowMs: now, fetchFn }),
+      fetchUsdNgnRate({ redisCommand, fetchFn }),
+    ]);
+
     const totalUniqueDevices = Number(results[0] || 0);
     const totalPaidActivations = Number(results[1] || 0);
     const platforms = {
@@ -267,8 +387,57 @@ module.exports = async function handler(req, res) {
     const totalResellerOrders = Number(results[7] || 0);
     const totalResellerUnits = Number(results[8] || 0);
 
+    const recordedSingleNaira = Number(results[9] || 0);
+    const referredActivations = Number(results[10] || 0);
+    const recordedResellerNaira = Number(results[11] || 0);
+    const recordedReferralsNaira = Number(results[12] || 0);
+
+    const aiQuota = {
+      watToday,
+      totalTurns: Number(results[13] || 0),
+      totalImages: Number(results[14] || 0),
+      totalVoice: Number(results[15] || 0),
+      todayTurns: Number(results[16] || 0),
+      todayImages: Number(results[17] || 0),
+      todayVoice: Number(results[18] || 0),
+    };
+
+    const pricing = loadPricingConfig();
+    const singleEstimated = recordedSingleNaira <= 0 && totalPaidActivations > 0;
+    const resellerEstimated = recordedResellerNaira <= 0 && totalResellerUnits > 0;
+
+    const singleGrossNaira = singleEstimated
+      ? Math.max(0, totalPaidActivations - referredActivations) * Number(pricing.standardPrice || 2500) +
+        referredActivations * Number(pricing.referredPrice || 2000)
+      : recordedSingleNaira;
+    const resellerGrossNaira = resellerEstimated
+      ? totalResellerUnits * Number(pricing.resellerPrice || 1500)
+      : recordedResellerNaira;
+    const grossRevenueNaira = singleGrossNaira + resellerGrossNaira;
+
+    const pendingTotalNaira = pendingWithdrawals.reduce(
+      (sum, x) => sum + Number(x.amountNaira || Math.abs(x.amount || 0)),
+      0
+    );
+    const paidWithdrawalsNaira = paidWithdrawals.reduce(
+      (sum, x) => sum + Number(x.amountNaira || Math.abs(x.amount || 0)),
+      0
+    );
+    const referralCostNaira = Math.max(recordedReferralsNaira, pendingTotalNaira + paidWithdrawalsNaira);
+    const netRevenueBeforeAiNaira = grossRevenueNaira - referralCostNaira;
+
+    const fxUsdNgn = Number(fxInfo?.rate || DEFAULT_USD_NGN_RATE);
+    const aiSpendTotalNaira = aiUsage ? Math.round(aiUsage.usageUsd * fxUsdNgn) : null;
+    const aiSpendDailyNaira = aiUsage ? Math.round(aiUsage.usageDailyUsd * fxUsdNgn) : null;
+    const estimatedNetProfitNaira =
+      aiSpendTotalNaira === null ? null : netRevenueBeforeAiNaira - aiSpendTotalNaira;
+    const aiBurnPercent =
+      aiSpendTotalNaira !== null && netRevenueBeforeAiNaira > 0
+        ? Number(((aiSpendTotalNaira / netRevenueBeforeAiNaira) * 100).toFixed(2))
+        : null;
+
     const last7Days = days.map((date, idx) => {
-      const base = 9 + idx * 3;
+      const base = DAY_OFFSET + idx * 3;
       return {
         date,
         newInstalls: Number(results[base] || 0),
@@ -289,6 +458,23 @@ module.exports = async function handler(req, res) {
       last7Days,
       pendingWithdrawals,
       paidWithdrawals,
+      aiQuota,
+      economics: {
+        singleGrossNaira,
+        resellerGrossNaira,
+        grossRevenueNaira,
+        singleEstimated,
+        resellerEstimated,
+        referralCostNaira,
+        netRevenueBeforeAiNaira,
+        fxUsdNgn,
+        fxSource: fxInfo?.source || 'fallback',
+        aiUsage,
+        aiSpendTotalNaira,
+        aiSpendDailyNaira,
+        estimatedNetProfitNaira,
+        aiBurnPercent,
+      },
     });
   } catch (err) {
     return sendJson(res, 502, {
@@ -296,4 +482,8 @@ module.exports = async function handler(req, res) {
       message: err.message || 'Unable to query stats.',
     });
   }
-};
+  };
+}
+
+module.exports = createStatsHandler();
+module.exports.createStatsHandler = createStatsHandler;

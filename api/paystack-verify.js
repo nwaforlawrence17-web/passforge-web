@@ -179,6 +179,7 @@ module.exports = async function handler(req, res) {
         paidAt,
         referralCode: expected.referralCode,
         referralReward: expected.referralReward,
+        amountNaira,
       });
     } catch (_) { }
 

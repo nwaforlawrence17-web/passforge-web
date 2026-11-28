@@ -108,6 +108,7 @@ async function handler(req, res) {
         paidAt: fulfillment.paidAt,
         referralCode: expected.referralCode,
         referralReward: expected.referralReward,
+        amountNaira: fulfillment.amountNaira,
       });
     } catch (_) {}
   }
