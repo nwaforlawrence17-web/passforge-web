@@ -71,7 +71,12 @@ module.exports = async function handler(req, res) {
           {
             display_name: 'Order Type',
             variable_name: 'order_type',
-            value: order.mode === 'reseller' ? `Reseller ${order.units}-PIN Pack` : 'Single Student License',
+            value:
+              order.mode === 'reseller'
+                ? `Reseller ${order.units}-PIN Pack`
+                : order.mode === 'ai_upgrade'
+                  ? `Jarvis Thinking Boost (${order.durationDays || 30} Days)`
+                  : 'Single Student License',
           },
           ...(order.productKey
             ? [{ display_name: 'App Product Key', variable_name: 'product_key', value: order.productKey }]

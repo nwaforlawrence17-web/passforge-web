@@ -301,13 +301,18 @@ function createStatsHandler({
 
       const productKey = normalizeProductKey(lookupRaw);
       if (productKey) {
-        const rawLic = await redisCommand(['GET', `license:key:${productKey}`]);
+        const [rawLic, rawUpgrade] = await redisPipeline([
+          ['GET', `license:key:${productKey}`],
+          ['GET', `jarvis:upgrade:${productKey}`],
+        ]);
         const license = safeJsonParse(rawLic);
+        const jarvisUpgrade = safeJsonParse(rawUpgrade);
         return sendJson(res, 200, {
           ok: true,
           lookupType: 'license',
           productKey,
           license,
+          jarvisUpgrade,
         });
       }
 
@@ -351,9 +356,11 @@ function createStatsHandler({
     ['GET', `stats:ai:turns:${watToday}`],
     ['GET', `stats:ai:images:${watToday}`],
     ['GET', `stats:ai:voice:${watToday}`],
+    ['GET', 'stats:revenue:upgrades:naira'],
+    ['GET', 'stats:upgrades:total'],
   ];
 
-  const DAY_OFFSET = 19;
+  const DAY_OFFSET = 21;
   for (const d of days) {
     commands.push(
       ['GET', `stats:devices:new:${d}`],
@@ -403,6 +410,8 @@ function createStatsHandler({
     };
 
     const pricing = loadPricingConfig();
+    const recordedUpgradeNaira = Number(results[19] || 0);
+    const totalBoostUpgrades = Number(results[20] || 0);
     const singleEstimated = recordedSingleNaira <= 0 && totalPaidActivations > 0;
     const resellerEstimated = recordedResellerNaira <= 0 && totalResellerUnits > 0;
 
@@ -413,7 +422,11 @@ function createStatsHandler({
     const resellerGrossNaira = resellerEstimated
       ? totalResellerUnits * Number(pricing.resellerPrice || 1500)
       : recordedResellerNaira;
-    const grossRevenueNaira = singleGrossNaira + resellerGrossNaira;
+    const upgradeGrossNaira =
+      recordedUpgradeNaira > 0
+        ? recordedUpgradeNaira
+        : totalBoostUpgrades * Number(pricing.aiUpgradePrice || 600);
+    const grossRevenueNaira = singleGrossNaira + resellerGrossNaira + upgradeGrossNaira;
 
     const pendingTotalNaira = pendingWithdrawals.reduce(
       (sum, x) => sum + Number(x.amountNaira || Math.abs(x.amount || 0)),
@@ -453,6 +466,7 @@ function createStatsHandler({
       totalPaidActivations,
       totalResellerOrders,
       totalResellerUnits,
+      totalBoostUpgrades,
       today: last7Days[0],
       platforms,
       last7Days,
@@ -462,6 +476,7 @@ function createStatsHandler({
       economics: {
         singleGrossNaira,
         resellerGrossNaira,
+        upgradeGrossNaira,
         grossRevenueNaira,
         singleEstimated,
         resellerEstimated,

@@ -8,7 +8,7 @@ const {
   resolveCheckoutOrder,
   sendJson,
 } = require('../lib/passforge');
-const { recordConfirmedSinglePurchase } = require('../lib/fulfillment');
+const { recordConfirmedAiUpgrade, recordConfirmedSinglePurchase } = require('../lib/fulfillment');
 const { recordConfirmedResellerPurchase } = require('../lib/reseller');
 const { createMailer, normalizeDeliverableEmail } = require('../lib/mailer');
 
@@ -143,6 +143,66 @@ module.exports = async function handler(req, res) {
         resellerOrderCode: orderCode,
         creditsRecorded,
         portalUrl: `/reseller.html?code=${encodeURIComponent(orderCode)}`,
+        buyerContact,
+        emailDelivery,
+        paidAt,
+      });
+    }
+
+    if (expected.mode === 'ai_upgrade') {
+      const recipientEmail =
+        normalizeDeliverableEmail(meta.buyerContact) ||
+        normalizeDeliverableEmail(tx.customer && tx.customer.email) ||
+        '';
+      const buyerContact = recipientEmail || meta.buyerContact || (tx.customer && tx.customer.email) || '';
+      const paidAt = tx.paid_at || tx.transaction_date || null;
+      const amountNaira = Number(tx.amount) / 100;
+      const durationDays = expected.durationDays || 30;
+      let upgraded = false;
+      let expiresAtMs = null;
+
+      try {
+        const upRes = await recordConfirmedAiUpgrade({
+          productKey: expected.productKey,
+          reference: tx.reference,
+          paidAt,
+          amountNaira,
+          durationDays,
+          buyerContact,
+        });
+        upgraded = Boolean(upRes && upRes.recorded);
+        expiresAtMs = upRes?.expiresAtMs || null;
+      } catch (upErr) {
+        console.warn('[paystack-verify] ai_upgrade Redis record failed:', upErr.message);
+      }
+
+      let emailDelivery = { sent: false, skipped: true, reason: 'NO_DELIVERABLE_EMAIL' };
+      try {
+        if (recipientEmail) {
+          const mailer = createMailer();
+          emailDelivery = await mailer.sendAiUpgradeEmail({
+            to: recipientEmail,
+            productKey: expected.productKey,
+            reference: tx.reference,
+            amountNaira,
+            durationDays,
+            expiresAtMs,
+          });
+        }
+      } catch (mailErr) {
+        console.warn('[paystack-verify] ai_upgrade email warning:', mailErr.message);
+      }
+
+      return sendJson(res, 200, {
+        verified: true,
+        mode: 'ai_upgrade',
+        planId: 'boost',
+        reference: tx.reference,
+        amountNaira,
+        productKey: expected.productKey,
+        durationDays,
+        expiresAtMs,
+        upgraded,
         buyerContact,
         emailDelivery,
         paidAt,

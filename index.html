@@ -1003,7 +1003,8 @@
       </div>
 
       <div class="gallery-scroll">
-        <div class="shot-card" onclick="openLightboxCard(this, 'Smart Study Home, Learning Games &amp; 18 Subject Dictionaries')">
+        <div class="shot-card"
+          onclick="openLightboxCard(this, 'Smart Study Home, Learning Games &amp; 18 Subject Dictionaries')">
           <div class="shot-img-wrap">
             <img src="screenshots/screen_1_home.png?v=2"
               onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
@@ -1011,7 +1012,8 @@
           </div>
           <div class="shot-meta">
             <strong>1. Smart Study Home</strong>
-            <span>Streak tracker, Continue Practice, Piano Tiles &amp; Scholar Millions, World Atlas, plus 18 Subject Dictionaries.</span>
+            <span>Streak tracker, Continue Practice, Piano Tiles &amp; Scholar Millions, World Atlas, plus 18 Subject
+              Dictionaries.</span>
           </div>
         </div>
 
@@ -1077,7 +1079,8 @@
           </div>
         </div>
 
-        <div class="shot-card" onclick="openLightboxCard(this, '2027 Compulsory Literature Texts &amp; Chapter Summaries')">
+        <div class="shot-card"
+          onclick="openLightboxCard(this, '2027 Compulsory Literature Texts &amp; Chapter Summaries')">
           <div class="shot-img-wrap">
             <img src="screenshots/screen_8_literature.png"
               onerror="if(location.protocol==='file:'){this.onerror=null;this.src='jamb_cbt/website/'+this.getAttribute('src');}"
@@ -1316,6 +1319,21 @@
             Activation PIN</button>
         </div>
 
+        <div class="price-card" style="border-color: rgba(167, 139, 250, 0.45);">
+          <div>
+            <div class="pill" style="margin-bottom:8px;color:#c4b5fd;background:rgba(139,92,246,0.16);border-color:rgba(167,139,250,0.4);">OPTIONAL 30-DAY AI PASS</div>
+            <h3>Jarvis Thinking Boost</h3>
+            <div class="price" id="boostCardPrice">₦600 <span>/ 30 days (Existing activated users)</span></div>
+            <ul class="list">
+              <li><strong>Deep Thinking Mode ON</strong> (Hy4-Flash step-by-step reasoning)</li>
+              <li><strong>30 text prompts/day</strong> + <strong>10 images/day</strong> + <strong>12 voice/day</strong></li>
+              <li><strong>20 past messages</strong> extended tutor memory</li>
+              <li>Activates live on your Product Key (no extra PIN needed)</li>
+            </ul>
+          </div>
+          <button class="btn-secondary" style="justify-content:center;border-color:rgba(167,139,250,0.55);color:#ddd6fe;" onclick="openCheckout('ai_upgrade')">⚡ Upgrade Jarvis AI (₦600)</button>
+        </div>
+
         <div class="price-card">
           <div>
             <div class="pill" style="margin-bottom:8px;">CAFÉS &amp; LESSON CENTERS</div>
@@ -1325,13 +1343,15 @@
               <li>Choose <strong>10, 25, or 50 activation PINs</strong> at ₦1,500 each</li>
               <li>Issue <strong>Direct Offline PINs</strong> or mint <strong>Copy &amp; Sell Scratch PINs</strong></li>
               <li>Sell to students at ₦2,500 &amp; keep <strong>₦1,000 profit per PIN</strong></li>
-              <li>Instant credits unlocked in your <a href="reseller.html" style="color:var(--accent);font-weight:700;text-decoration:none;">Reseller Portal</a></li>
+              <li>Instant credits unlocked in your <a href="reseller.html"
+                  style="color:var(--accent);font-weight:700;text-decoration:none;">Reseller Portal</a></li>
             </ul>
           </div>
           <div style="display:grid;gap:8px;">
             <button class="btn-secondary" style="justify-content:center;" onclick="openCheckout('reseller')">Order Bulk
               Reseller PINs</button>
-            <a class="btn-secondary" style="justify-content:center;font-size:12.5px;padding:9px 14px;" href="reseller.html">Already Purchased? Open Reseller Portal →</a>
+            <a class="btn-secondary" style="justify-content:center;font-size:12.5px;padding:9px 14px;"
+              href="reseller.html">Already Purchased? Open Reseller Portal →</a>
           </div>
         </div>
       </div>
@@ -1410,28 +1430,41 @@
       <button class="close-btn" onclick="closeCheckout()">✕</button>
       <div class="mock-label" id="checkoutTag">INSTANT PAYSTACK CHECKOUT · CARD / TRANSFER / USSD</div>
       <h3 id="checkoutTitle" style="font-size:20px;margin-bottom:6px;">Buy Student Activation PIN</h3>
-      <p id="checkoutSubtitle" style="font-size:13px;color:var(--muted);margin-bottom:12px;">Enter your email address and your app's Product
+      <p id="checkoutSubtitle" style="font-size:13px;color:var(--muted);margin-bottom:12px;">Enter your email address
+        and your app's Product
         Key to receive your device-locked Activation PIN immediately and by email.</p>
-      <label id="buyerInputLabel" style="font-size:12px;color:var(--muted);">Student Email Address (Required for Auto-Email Backup)</label>
+      <label id="buyerInputLabel" style="font-size:12px;color:var(--muted);">Student Email Address (Required for
+        Auto-Email Backup)</label>
       <input class="input" id="buyerInput" type="email" autocomplete="email" placeholder="e.g. student@gmail.com" />
-      <label id="buyerPhoneLabel" style="font-size:12px;color:var(--muted);">WhatsApp / Phone Number (Optional — for 1-Tap Self-Backup)</label>
-      <input class="input" id="buyerPhoneInput" type="tel" autocomplete="tel" placeholder="e.g. 0803 123 4567 (optional)" />
+      <label id="buyerPhoneLabel" style="font-size:12px;color:var(--muted);">WhatsApp / Phone Number (Optional — for
+        1-Tap Self-Backup)</label>
+      <input class="input" id="buyerPhoneInput" type="tel" autocomplete="tel"
+        placeholder="e.g. 0803 123 4567 (optional)" />
       <div id="resellerPackFields" style="display:none;margin-bottom:10px;">
-        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Select Reseller Pack Size</label>
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Select Reseller Pack
+          Size</label>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-          <button type="button" class="btn-secondary pack-size-btn" data-units="10" style="justify-content:center;padding:10px 8px;font-size:13px;" onclick="selectResellerUnits(10)">10 PINs<br/><span id="packPrice10" style="font-size:11px;color:var(--accent);">₦15,000</span></button>
-          <button type="button" class="btn-secondary pack-size-btn" data-units="25" style="justify-content:center;padding:10px 8px;font-size:13px;" onclick="selectResellerUnits(25)">25 PINs<br/><span id="packPrice25" style="font-size:11px;color:var(--accent);">₦37,500</span></button>
-          <button type="button" class="btn-secondary pack-size-btn" data-units="50" style="justify-content:center;padding:10px 8px;font-size:13px;" onclick="selectResellerUnits(50)">50 PINs<br/><span id="packPrice50" style="font-size:11px;color:var(--accent);">₦75,000</span></button>
+          <button type="button" class="btn-secondary pack-size-btn" data-units="10"
+            style="justify-content:center;padding:10px 8px;font-size:13px;" onclick="selectResellerUnits(10)">10
+            PINs<br /><span id="packPrice10" style="font-size:11px;color:var(--accent);">₦15,000</span></button>
+          <button type="button" class="btn-secondary pack-size-btn" data-units="25"
+            style="justify-content:center;padding:10px 8px;font-size:13px;" onclick="selectResellerUnits(25)">25
+            PINs<br /><span id="packPrice25" style="font-size:11px;color:var(--accent);">₦37,500</span></button>
+          <button type="button" class="btn-secondary pack-size-btn" data-units="50"
+            style="justify-content:center;padding:10px 8px;font-size:13px;" onclick="selectResellerUnits(50)">50
+            PINs<br /><span id="packPrice50" style="font-size:11px;color:var(--accent);">₦75,000</span></button>
         </div>
       </div>
       <div id="singleStudentFields">
-        <label style="font-size:12px;color:var(--muted);">App Product Key (from Activation Hub in App)</label>
+        <label style="font-size:12px;color:var(--muted);">App Product Key (from Activation Hub / Profile in App)</label>
         <input class="input" id="deviceKeyInput" placeholder="e.g. K8M-4P2-9X7"
           style="text-transform:uppercase;font-family:var(--mono);" />
-        <label style="font-size:12px;color:var(--muted);" id="referralLabel">Referral Code (Optional — saves
-          ₦500)</label>
-        <input class="input" id="referralInput" placeholder="e.g. JAMB-8K4M2P (pay ₦2,000 instead of ₦2,500)"
-          style="text-transform:uppercase;font-family:var(--mono);" oninput="updateReferralDiscount()" />
+        <div id="referralFieldGroup">
+          <label style="font-size:12px;color:var(--muted);" id="referralLabel">Referral Code (Optional — saves
+            ₦500)</label>
+          <input class="input" id="referralInput" placeholder="e.g. JAMB-8K4M2P (pay ₦2,000 instead of ₦2,500)"
+            style="text-transform:uppercase;font-family:var(--mono);" oninput="updateReferralDiscount()" />
+        </div>
       </div>
       <div class="va-box">
         <div style="font-size:11px;color:var(--muted);">PAYSTACK CHECKOUT SUMMARY</div>
@@ -1451,12 +1484,18 @@
           ACTIVATION PIN READY</div>
         <div id="pinCode" style="font-family:var(--mono);font-size:18px;font-weight:700;margin-top:4px;"></div>
         <div id="pinMeta" style="font-size:12px;color:var(--muted);margin-top:6px;"></div>
-        <div id="emailDeliveryStatus" style="display:none;font-size:12px;margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#a7f3d0;"></div>
-        <div id="chromeSavePrompt" style="display:none;margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35);font-size:12px;color:#dbeafe;">
-          <div id="chromeSaveText" style="margin-bottom:8px;">Save your Activation PIN to <strong>Chrome Password Manager</strong> so Chrome remembers it?</div>
+        <div id="emailDeliveryStatus"
+          style="display:none;font-size:12px;margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#a7f3d0;">
+        </div>
+        <div id="chromeSavePrompt"
+          style="display:none;margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35);font-size:12px;color:#dbeafe;">
+          <div id="chromeSaveText" style="margin-bottom:8px;">Save your Activation PIN to <strong>Chrome Password
+              Manager</strong> so Chrome remembers it?</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-primary" id="saveChromeBtn" type="button" style="padding:7px 12px;font-size:12px;" onclick="promptSavePinToChrome()">Yes, Save in Chrome</button>
-            <button class="btn-secondary" type="button" style="padding:7px 12px;font-size:12px;" onclick="document.getElementById('chromeSavePrompt').style.display='none'">Not Now</button>
+            <button class="btn-primary" id="saveChromeBtn" type="button" style="padding:7px 12px;font-size:12px;"
+              onclick="promptSavePinToChrome()">Yes, Save in Chrome</button>
+            <button class="btn-secondary" type="button" style="padding:7px 12px;font-size:12px;"
+              onclick="document.getElementById('chromeSavePrompt').style.display='none'">Not Now</button>
           </div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
@@ -1468,8 +1507,7 @@
             style="padding:8px 14px;font-size:12px;display:none;" href="#">
             Send to My WhatsApp
           </a>
-          <a class="btn-secondary" id="sendSmsBtn"
-            style="padding:8px 14px;font-size:12px;display:none;" href="#">
+          <a class="btn-secondary" id="sendSmsBtn" style="padding:8px 14px;font-size:12px;display:none;" href="#">
             Send via Phone SMS
           </a>
           <button class="btn-secondary" id="downloadBackupBtn" type="button"
@@ -1491,11 +1529,13 @@
             onclick="verifyPaystackReference(document.getElementById('manualRefInput').value)">Verify</button>
         </div>
       </details>
-      <div style="margin-top:12px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+      <div
+        style="margin-top:12px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
         <span>Need help with payment or your PIN?</span>
         <a id="checkoutWhatsappSupport" target="_blank" rel="noopener"
           style="color:var(--emerald);font-weight:700;text-decoration:none;"
-          href="https://wa.me/2349164844687?text=Hello%20PassForge%20Support%2C%20I%20need%20help%20with%20PassForge%20checkout.">Chat on WhatsApp →</a>
+          href="https://wa.me/2349164844687?text=Hello%20PassForge%20Support%2C%20I%20need%20help%20with%20PassForge%20checkout.">Chat
+          on WhatsApp →</a>
       </div>
     </div>
   </div>
@@ -1577,7 +1617,9 @@
       standardPrice: 2500,
       referredPrice: 2000,
       referralReward: 500,
-      resellerPrice: 1500
+      resellerPrice: 1500,
+      aiUpgradePrice: 600,
+      aiUpgradeDays: 30
     };
 
     function fmtNaira(n) {
@@ -1647,34 +1689,52 @@
     }
 
     function openCheckout(mode) {
-      currentCheckoutMode = mode;
+      currentCheckoutMode = mode === 'reseller' ? 'reseller' : mode === 'ai_upgrade' ? 'ai_upgrade' : 'single';
       showCheckoutError('');
       document.getElementById('pinResult').style.display = 'none';
       const portalLink = document.getElementById('openResellerPortalLink');
       if (portalLink) portalLink.style.display = 'none';
       const singleFields = document.getElementById('singleStudentFields');
+      const referralGroup = document.getElementById('referralFieldGroup');
       const resellerFields = document.getElementById('resellerPackFields');
       const discountBadge = document.getElementById('discountBadge');
       const subtitle = document.getElementById('checkoutSubtitle');
       const buyerLabel = document.getElementById('buyerInputLabel');
       const waSupport = document.getElementById('checkoutWhatsappSupport');
-      if (mode === 'reseller') {
+      if (currentCheckoutMode === 'reseller') {
         if (subtitle) subtitle.textContent = 'Select a bulk pack size (10, 25, or 50 PINs). After payment you receive a Reseller Order Code on screen and by email for Direct Offline PINs and Scratch PINs.';
         if (buyerLabel) buyerLabel.textContent = 'Reseller Email Address (Required for Order Code & Scratch PINs)';
         if (resellerFields) resellerFields.style.display = 'block';
         if (singleFields) singleFields.style.display = 'none';
+        if (referralGroup) referralGroup.style.display = 'block';
         if (discountBadge) discountBadge.style.display = 'none';
         if (waSupport) {
           waSupport.href = 'https://wa.me/2349164844687?text=' + encodeURIComponent('Hello PassForge Support, I am a reseller and need help with a bulk PIN order.');
           waSupport.textContent = 'Reseller WhatsApp Support →';
         }
         selectResellerUnits(currentResellerUnits);
+      } else if (currentCheckoutMode === 'ai_upgrade') {
+        const boostPrice = Number(livePricing.aiUpgradePrice || 600);
+        const boostDays = Number(livePricing.aiUpgradeDays || 30);
+        document.getElementById('checkoutTitle').textContent = `Jarvis Thinking Boost (${fmtNaira(boostPrice)} / ${boostDays} Days)`;
+        if (subtitle) subtitle.textContent = "Unlock Deep Thinking Mode (Hy4-Flash), 30 text prompts/day, 10 images/day, 12 online voice turns/day, and 20-message tutor memory. Applies automatically to your Product Key.";
+        if (buyerLabel) buyerLabel.textContent = 'Student Email Address (Receipt & Renewal Confirmation)';
+        if (resellerFields) resellerFields.style.display = 'none';
+        if (singleFields) singleFields.style.display = 'block';
+        if (referralGroup) referralGroup.style.display = 'none';
+        if (discountBadge) discountBadge.style.display = 'none';
+        document.getElementById('modalAmount').textContent = `${fmtNaira(boostPrice)} (${boostDays}-Day Jarvis Boost)`;
+        if (waSupport) {
+          waSupport.href = 'https://wa.me/2349164844687?text=' + encodeURIComponent('Hello PassForge Support, I need help with my Jarvis AI Boost (₦600) upgrade.');
+          waSupport.textContent = 'Student WhatsApp Support →';
+        }
       } else {
         document.getElementById('checkoutTitle').textContent = 'Buy Student Activation PIN';
         if (subtitle) subtitle.textContent = "Enter your email address and your app's Product Key to receive your device-locked Activation PIN immediately and by email.";
         if (buyerLabel) buyerLabel.textContent = 'Student Email Address (Required for Auto-Email Backup)';
         if (resellerFields) resellerFields.style.display = 'none';
         if (singleFields) singleFields.style.display = 'block';
+        if (referralGroup) referralGroup.style.display = 'block';
         if (waSupport) {
           waSupport.href = 'https://wa.me/2349164844687?text=' + encodeURIComponent('Hello PassForge Support, I need help activating or buying a PassForge UTME PIN.');
           waSupport.textContent = 'Student WhatsApp Support →';
@@ -1721,19 +1781,21 @@
       try {
         sessionStorage.setItem('passforge_last_email', buyerContact);
         if (buyerPhone) sessionStorage.setItem('passforge_last_phone', buyerPhone);
-      } catch (_) {}
-      if (currentCheckoutMode === 'single') {
+      } catch (_) { }
+      if (currentCheckoutMode === 'single' || currentCheckoutMode === 'ai_upgrade') {
         const cleanedKey = productKeyRaw.replace(/[^A-Z0-9]/g, '');
         if (!/^[A-Z0-9]{9}$/.test(cleanedKey)) {
-          return showCheckoutError('Please enter the 9-character App Product Key from Activation Hub (e.g. K8M-4P2-9X7).');
+          return showCheckoutError('Please enter the 9-character App Product Key from your PassForge app (e.g. K8M-4P2-9X7).');
         }
-        if (referralCode && !/^JAMB-[A-Z0-9]{6}$/.test(referralCode)) {
+        if (currentCheckoutMode === 'single' && referralCode && !/^JAMB-[A-Z0-9]{6}$/.test(referralCode)) {
           return showCheckoutError('Referral code format should look like JAMB-8K4M2P (or leave blank).');
         }
       }
 
       if (window.location.hostname.endsWith('github.io')) {
-        window.location.href = `${VERCEL_CHECKOUT_URL}/?open_checkout=${currentCheckoutMode}`;
+        const qp = new URLSearchParams({ open_checkout: currentCheckoutMode });
+        if (productKeyRaw) qp.set('key', productKeyRaw);
+        window.location.href = `${VERCEL_CHECKOUT_URL}/?${qp.toString()}`;
         return;
       }
 
@@ -1750,7 +1812,7 @@
             mode: currentCheckoutMode,
             units: currentCheckoutMode === 'reseller' ? currentResellerUnits : 1,
             buyerContact,
-            productKey: currentCheckoutMode === 'single' ? productKeyRaw : '',
+            productKey: (currentCheckoutMode === 'single' || currentCheckoutMode === 'ai_upgrade') ? productKeyRaw : '',
             referralCode: currentCheckoutMode === 'single' ? referralCode : ''
           })
         });
@@ -1815,7 +1877,7 @@
         try {
           storedEmail = sessionStorage.getItem('passforge_last_email') || '';
           storedPhone = sessionStorage.getItem('passforge_last_phone') || '';
-        } catch (_) {}
+        } catch (_) { }
         const buyerEmail = (data.buyerContact && data.buyerContact.includes('@') && !/^wa\.\d+@passforge\.ng$/i.test(data.buyerContact))
           ? data.buyerContact
           : storedEmail;
@@ -1842,6 +1904,27 @@
             email: buyerEmail,
             phone: storedPhone,
             portalUrl: `https://passforge-utme.vercel.app/reseller.html?code=${encodeURIComponent(data.resellerOrderCode)}`,
+          };
+        } else if (data.mode === 'ai_upgrade') {
+          const portalLink = document.getElementById('openResellerPortalLink');
+          if (portalLink) portalLink.style.display = 'none';
+          const expiryLabel = data.expiresAtMs
+            ? new Date(data.expiresAtMs).toLocaleDateString('en-NG', { year: 'numeric', month: 'short', day: 'numeric' })
+            : `${data.durationDays || 30} days`;
+          statusLabel.textContent = `PAYMENT VERIFIED (${fmtNaira(data.amountNaira)}) · JARVIS BOOST ACTIVE`;
+          pinCodeEl.textContent = `BOOST ACTIVE · ${data.productKey}`;
+          lastVerifiedPin = '';
+          pinMetaEl.textContent = `30 prompts/day · 10 images/day · 12 voice/day · Thinking ON · Active until ${expiryLabel}. Open PassForge → Tap "Refresh Plan"!`;
+          copyBtn.style.display = 'none';
+          window.__pfVerifiedBackup = {
+            mode: 'ai_upgrade',
+            code: data.productKey,
+            formattedCode: expiryLabel,
+            productKey: data.productKey,
+            reference: data.reference,
+            amountNaira: data.amountNaira,
+            email: buyerEmail,
+            phone: storedPhone,
           };
         } else {
           const portalLink = document.getElementById('openResellerPortalLink');
@@ -1931,6 +2014,15 @@
           `Portal: ${b.portalUrl}`,
         ].join('\n');
       }
+      if (b.mode === 'ai_upgrade') {
+        return [
+          'PassForge UTME 2027 - Jarvis Thinking Boost Receipt',
+          `Product Key: ${b.productKey}`,
+          `Active Until: ${b.formattedCode}`,
+          `Paystack Ref: ${b.reference}`,
+          'Open PassForge UTME -> Tap "Refresh Plan" (no extra PIN needed).',
+        ].join('\n');
+      }
       return [
         'PassForge UTME 2027 - Activation Backup',
         `Product Key: ${b.productKey}`,
@@ -2015,7 +2107,7 @@
         openCheckout('single');
         document.getElementById('manualRefInput').value = ref;
         verifyPaystackReference(ref);
-      } else if (openMode === 'single' || openMode === 'reseller') {
+      } else if (openMode === 'single' || openMode === 'reseller' || openMode === 'ai_upgrade') {
         openCheckout(openMode);
       }
     })();

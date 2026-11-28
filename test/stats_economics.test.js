@@ -113,6 +113,24 @@ test('stats handler computes real-time gross revenue, referral cost, AI spend, a
     referralReward: 500,
     amountNaira: 2000,
   });
+  const boostFirst = await recordSingle.recordConfirmedAiUpgrade({
+    productKey: 'AAA-BBB-CCC',
+    reference: 'ref_boost_1',
+    amountNaira: 600,
+    durationDays: 30,
+    buyerContact: 'student@example.com',
+  });
+  assert.equal(boostFirst.recorded, true);
+  assert.equal(boostFirst.alreadyProcessed, false);
+  // Idempotent replay of the same Paystack reference must not extend expiry or double-count revenue.
+  const boostDup = await recordSingle.recordConfirmedAiUpgrade({
+    productKey: 'AAA-BBB-CCC',
+    reference: 'ref_boost_1',
+    amountNaira: 600,
+    durationDays: 30,
+  });
+  assert.equal(boostDup.alreadyProcessed, true);
+  assert.equal(boostDup.expiresAtMs, boostFirst.expiresAtMs);
   await reseller.recordConfirmedResellerPurchase({
     orderCode: 'RES-1111-2222-3333',
     reference: 'ref_res_1',
@@ -180,13 +198,14 @@ test('stats handler computes real-time gross revenue, referral cost, AI spend, a
   assert.equal(body.ok, true);
   assert.equal(body.economics.singleGrossNaira, 4500);
   assert.equal(body.economics.resellerGrossNaira, 15000);
-  assert.equal(body.economics.grossRevenueNaira, 19500);
+  assert.equal(body.economics.upgradeGrossNaira, 600);
+  assert.equal(body.economics.grossRevenueNaira, 20100);
   assert.equal(body.economics.referralCostNaira, 500);
-  assert.equal(body.economics.netRevenueBeforeAiNaira, 19000);
+  assert.equal(body.economics.netRevenueBeforeAiNaira, 19600);
   assert.equal(body.economics.fxUsdNgn, 1600);
   assert.equal(body.economics.aiSpendTotalNaira, 4000); // $2.50 * 1600
   assert.equal(body.economics.aiSpendDailyNaira, 400); // $0.25 * 1600
-  assert.equal(body.economics.estimatedNetProfitNaira, 15000); // 19000 - 4000
+  assert.equal(body.economics.estimatedNetProfitNaira, 15600); // 19600 - 4000
   assert.equal(body.aiQuota.totalTurns, 120);
   assert.equal(body.aiQuota.totalImages, 18);
   assert.equal(body.aiQuota.totalVoice, 30);

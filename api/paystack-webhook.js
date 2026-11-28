@@ -8,7 +8,7 @@ const {
   sendJson,
   verifyPaystackSignature,
 } = require('../lib/passforge');
-const { recordConfirmedSinglePurchase } = require('../lib/fulfillment');
+const { recordConfirmedAiUpgrade, recordConfirmedSinglePurchase } = require('../lib/fulfillment');
 const { recordConfirmedResellerPurchase } = require('../lib/reseller');
 const { createMailer, normalizeDeliverableEmail } = require('../lib/mailer');
 
@@ -90,6 +90,29 @@ async function handler(req, res) {
       units: expected.units,
       resellerOrderCode: orderCode,
     };
+  } else if (expected.mode === 'ai_upgrade') {
+    const durationDays = expected.durationDays || 30;
+    let expiresAtMs = null;
+    try {
+      const upRes = await recordConfirmedAiUpgrade({
+        productKey: expected.productKey,
+        reference: tx.reference,
+        paidAt: fulfillment.paidAt,
+        amountNaira: fulfillment.amountNaira,
+        durationDays,
+        buyerContact: fulfillment.buyerContact,
+      });
+      expiresAtMs = upRes?.expiresAtMs || null;
+    } catch (upErr) {
+      console.warn('[paystack-webhook] ai_upgrade Redis record failed:', upErr.message);
+    }
+    fulfillment = {
+      ...fulfillment,
+      productKey: expected.productKey,
+      planId: 'boost',
+      durationDays,
+      expiresAtMs,
+    };
   } else if (secretSalt) {
     const pin = generateActivationPin(expected.productKey, secretSalt);
     fulfillment = {
@@ -128,6 +151,15 @@ async function handler(req, res) {
           units: fulfillment.units,
           amountNaira: fulfillment.amountNaira,
           reference: fulfillment.reference,
+        });
+      } else if (fulfillment.mode === 'ai_upgrade' && fulfillment.productKey) {
+        await mailer.sendAiUpgradeEmail({
+          to: recipientEmail,
+          productKey: fulfillment.productKey,
+          reference: fulfillment.reference,
+          amountNaira: fulfillment.amountNaira,
+          durationDays: fulfillment.durationDays || 30,
+          expiresAtMs: fulfillment.expiresAtMs || null,
         });
       } else if (fulfillment.activationPin) {
         await mailer.sendSingleActivationEmail({

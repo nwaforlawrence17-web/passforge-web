@@ -3,6 +3,8 @@
   "referredPrice": 2000,
   "referralReward": 500,
   "resellerPrice": 1500,
+  "aiUpgradePrice": 600,
+  "aiUpgradeDays": 30,
   "minWithdrawalAmount": 500,
   "websiteUrl": "https://passforge-utme.vercel.app"
 }
